@@ -54,7 +54,7 @@ const stor={
   set:(k,v)=>{try{localStorage.setItem('fit_'+k,JSON.stringify(v));}catch{}}
 };
 // swap for /.netlify/functions/estimate after deployment
-const AI_URL='https://api.anthropic.com/v1/messages';
+const AI_URL='https:///.netlify/functions/estimate/v1/messages';
 const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
 const validMT=t=>['image/jpeg','image/png','image/gif','image/webp'].includes(t)?t:'image/jpeg';
 
