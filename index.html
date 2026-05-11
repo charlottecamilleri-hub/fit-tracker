@@ -274,7 +274,7 @@ function AIEst({onAdd}){
   const run=useCallback(async()=>{
     if(!q.trim())return;setLoad(true);setErr('');setRes(null);
     try{
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}',messages:[{role:'user',content:q}]})});
+      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}',messages:[{role:'user',content:q}]})});
       const d=await r.json();setRes(JSON.parse((d.content?.[0]?.text||'').replace(/```json|```/g,'').trim()));
     }catch{setErr('Could not connect. Check your API key is set in Netlify environment variables.');}
     setLoad(false);
@@ -305,7 +305,7 @@ function PhotoEst({onAdd}){
     try{
       const b64=await toB64(file);
       const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:400,
+        model:'claude-sonnet-4-6',max_tokens:400,
         system:'You are a nutrition expert. Analyse this food photo and estimate nutritional content. Return ONLY raw JSON: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}. Make reasonable assumptions about portion size from what is visible.',
         messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:validMT(file.type),data:b64}},{type:'text',text:'Estimate the nutritional content of this food.'}]}]
       })});
