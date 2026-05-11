@@ -276,7 +276,7 @@ function AIEst({onAdd}){
     try{
       const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}',messages:[{role:'user',content:q}]})});
       const d=await r.json();setRes(JSON.parse((d.content?.[0]?.text||'').replace(/```json|```/g,'').trim()));
-    }catch{setErr('AI estimate unavailable in local preview. Works once deployed with API key.');}
+    }catch{setErr('Could not connect. Check your API key is set in Netlify environment variables.');}
     setLoad(false);
   },[q]);
   const doAdd=()=>{if(!res)return;onAdd({id:Date.now(),ts:Date.now(),source:'ai',...res});setQ('');setRes(null);};
