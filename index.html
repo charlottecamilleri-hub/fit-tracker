@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>My Tracker</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -10,48 +10,107 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.1.1/index.css"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#08080F}
-body{font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px;color:#F0F0FF}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#060612}
+body{
+  font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px;color:#F0F0FF;
+  background:
+    radial-gradient(ellipse 55% 35% at 10% 10%, rgba(191,90,242,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 30% at 90% 5%, rgba(0,200,255,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 75% 90%, rgba(255,55,95,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 5% 85%, rgba(10,132,255,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 50% 50%, rgba(255,159,10,0.08) 0%, transparent 70%),
+    #060612;
+  background-attachment:fixed;
+}
 #root{max-width:680px;margin:0 auto}
-input,textarea,select{font-family:'Space Grotesk',system-ui,sans-serif;font-size:14px;color:#F0F0FF;background:#181828;border:0.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:10px 14px;width:100%;outline:none;-webkit-appearance:none;appearance:none}
-input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(255,255,255,0.06)}
-select option{background:#0F0F1C;color:#F0F0FF}
-textarea{resize:vertical}
-button{font-family:'Space Grotesk',system-ui,sans-serif;cursor:pointer;border:none;background:none;color:#F0F0FF;padding:0;font-size:14px;font-weight:500}
-button:active{transform:scale(0.97)}
-.btn{border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 18px;background:#181828;color:#F0F0FF;transition:background 0.12s}
-.btn:hover{background:#20202E}
-.btn:disabled{opacity:0.28;cursor:not-allowed;transform:none}
-.btn.sm{padding:6px 13px;font-size:13px;border-radius:9px}
-.btn.ghost{background:transparent;border-color:transparent;color:#6A6A90}
-.btn.ghost:hover{color:#F0F0FF;background:rgba(255,255,255,0.05)}
-.btn.dng{color:#FF6B6B;border-color:rgba(255,107,107,0.2);background:transparent}
-.btn.dng:hover{background:rgba(255,107,107,0.07)}
-.card{background:#0F0F1C;border:0.5px solid rgba(255,255,255,0.07);border-radius:20px;padding:1.25rem 1.4rem}
-.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#181828;color:#6A6A90}
-.lbl{font-size:11px;font-weight:600;color:#454560;text-transform:uppercase;letter-spacing:0.09em;display:block;margin-bottom:12px}
-input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:#20203A;border:none;padding:0;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;border:3px solid #08080F}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;border:3px solid #08080F;cursor:pointer}
+input,textarea,select{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  font-size:16px;color:#F0F0FF;background:#13132A;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:12px 14px;
+  width:100%;outline:none;
+  -webkit-appearance:none;appearance:none;
+  min-height:50px;
+}
+input:focus,textarea:focus,select:focus{border-color:rgba(255,255,255,0.3);background:#1A1A35}
+select option{background:#0D0D20;color:#F0F0FF}
+textarea{resize:vertical;min-height:80px}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+button{font-family:'Space Grotesk',system-ui,sans-serif;cursor:pointer;border:none;background:none;color:#F0F0FF;padding:0;font-size:14px;font-weight:600;-webkit-tap-highlight-color:transparent}
+button:active{opacity:0.72}
+.btn{border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 18px;background:#13132A;color:#F0F0FF;transition:background 0.12s;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{background:#1A1A35}
+.btn:disabled{opacity:0.25;cursor:not-allowed}
+.btn.sm{padding:10px 14px;font-size:13px;border-radius:11px;min-height:42px}
+.btn.ghost{background:transparent;border-color:transparent;color:#5A5A80}
+.btn.ghost:hover{color:#F0F0FF;background:rgba(255,255,255,0.06)}
+.btn.dng{color:#FF375F;border-color:rgba(255,55,95,0.25);background:rgba(255,55,95,0.06)}
+.btn.dng:hover{background:rgba(255,55,95,0.12)}
+.card{background:rgba(10,10,28,0.75);border:1px solid rgba(255,255,255,0.09);border-radius:22px;padding:1.25rem 1.4rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.neon-pink{box-shadow:0 0 24px rgba(255,55,95,0.55),0 0 48px rgba(255,55,95,0.2)}
+.neon-cyan{box-shadow:0 0 24px rgba(0,200,255,0.55),0 0 48px rgba(0,200,255,0.2)}
+.neon-violet{box-shadow:0 0 24px rgba(191,90,242,0.55),0 0 48px rgba(191,90,242,0.2)}
+.neon-blue{box-shadow:0 0 24px rgba(10,132,255,0.5),0 0 48px rgba(10,132,255,0.18)}
+.neon-amber{box-shadow:0 0 24px rgba(255,159,10,0.5),0 0 48px rgba(255,159,10,0.18)}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:#1A1A35;color:#6A6A90;letter-spacing:0.02em}
+.lbl{font-size:10px;font-weight:700;color:#3A3A60;text-transform:uppercase;letter-spacing:0.12em;display:block;margin-bottom:12px}
+input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1A1A35;border:none;padding:0;cursor:pointer;min-height:auto}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;cursor:pointer;border:3px solid #060612}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;border:3px solid #060612;cursor:pointer}
+.stepper-btn{width:50px;height:50px;border-radius:14px;background:#13132A;border:1px solid rgba(255,255,255,0.12);color:#F0F0FF;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon-btn{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+:root{--tx:#F0F0FF;--mu:#6060A0;--dim:#1E1E3A;--sf:rgba(10,10,28,0.75);--rz:#13132A;--bdr:rgba(255,255,255,0.09)}
+body.light{
+  --tx:#0A0A20;--mu:#4A4A90;--dim:#D0D0E8;--sf:rgba(255,255,255,0.88);--rz:#EEEEF8;--bdr:rgba(0,0,20,0.1);
+  background:radial-gradient(ellipse 55% 35% at 10% 10%,rgba(191,90,242,0.07) 0%,transparent 70%),radial-gradient(ellipse 45% 30% at 90% 5%,rgba(0,200,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 50% 35% at 75% 90%,rgba(255,55,95,0.07) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 5% 85%,rgba(10,132,255,0.05) 0%,transparent 70%),#F2F2FF;
+}
+body.light .card{background:rgba(255,255,255,0.88)!important;border-color:rgba(0,0,20,0.08)!important}
+body.light input:not([type=range]),body.light textarea,body.light select{background:#F0F0F8!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.15)!important}
+body.light .btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
+body.light .btn.ghost{background:transparent!important;color:#5050A0!important}
+body.light .btn.dng{color:#FF375F!important;background:rgba(255,55,95,0.06)!important;border-color:rgba(255,55,95,0.2)!important}
+body.light .pill{background:#E0E0F0!important;color:#5050A0!important}
+body.light .stepper-btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
+body.light .lbl{color:#7070B0!important}
+body.light nav{background:rgba(242,242,255,0.92)!important;border-color:rgba(0,0,20,0.08)!important}
+body.light .neon-pink,body.light .neon-cyan,body.light .neon-violet,body.light .neon-blue,body.light .neon-amber{box-shadow:0 4px 16px rgba(0,0,0,0.1)!important}
+body.light input[type=range]{background:#D8D8EE!important}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useCallback}=React;
-const BG='#08080F',SF='#0F0F1C',RZ='#181828';
-const BDR='rgba(255,255,255,0.07)';
-const TX='#F0F0FF',MU='#6A6A90',DIM='#20203A';
-const CORAL='#FF6B6B',BLUE='#4D9EFF',AMBER='#FFB347',PURPLE='#9B7BFF',MINT='#00D4A0';
-const ACCENTS={mint:'#00D4A0',coral:'#FF6B6B',blue:'#4D9EFF',purple:'#9B7BFF',gold:'#FFB347',rose:'#FF6B9D'};
-const DG={calories:2000,protein:140,carbs:200,fat:65,name:'',accent:'mint',appName:'My Tracker'};
+
+/* ── Vibrant electric palette ── */
+const BG='#060612',SF='var(--sf)',RZ='var(--rz)';
+const BDR='var(--bdr)';
+const TX='var(--tx)',MU='var(--mu)',DIM='var(--dim)';
+
+/* Electric accent colors */
+const PINK='#FF375F';
+const CYAN='#00C8FF';
+const VIOLET='#BF5AF2';
+const BLUE='#0A84FF';
+const AMBER='#FF9F0A';
+const LIME='#32D74B';
+
+/* Text colors on colored backgrounds */
+const ON_PINK='#FFFFFF';
+const ON_CYAN='#060612';
+const ON_VIOLET='#FFFFFF';
+const ON_BLUE='#FFFFFF';
+const ON_AMBER='#060612';
+const ON_LIME='#060612';
+
+const DG={calories:2000,protein:140,carbs:200,fat:65,name:'',theme:'dark',appName:'My Tracker'};
 const MG=['chest','back','shoulders','biceps','triceps','legs','glutes','core','cardio','full body'];
 const tod=()=>new Date().toDateString();
 const ds=ts=>new Date(ts).toDateString();
-const h=(c,o=0.15)=>`${c}${Math.round(o*255).toString(16).padStart(2,'0')}`;
-
-/* localStorage — AI_URL points to Netlify function on deploy */
+const h=(c,o)=>`${c}${Math.round(o*255).toString(16).padStart(2,'0')}`;
 const stor={
   get:k=>{try{const v=localStorage.getItem('fit_'+k);return v?JSON.parse(v):null;}catch{return null;}},
   set:(k,v)=>{try{localStorage.setItem('fit_'+k,JSON.stringify(v));}catch{}}
@@ -59,28 +118,43 @@ const stor={
 const AI_URL='/.netlify/functions/estimate';
 const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
 const validMT=t=>['image/jpeg','image/png','image/gif','image/webp'].includes(t)?t:'image/jpeg';
+function calcStreak(foods){let s=0;for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(foods.some(f=>ds(f.ts)===d.toDateString()))s++;else break;}return s;}
 
-function calcStreak(foods){
-  let s=0;
-  for(let i=0;i<365;i++){
-    const d=new Date();d.setDate(d.getDate()-i);
-    if(foods.some(f=>ds(f.ts)===d.toDateString()))s++;
-    else break;
-  }
-  return s;
+function GoalField({label,k,u,mn,mx,st,c,loc,setLoc}){
+  const clamp=v=>Math.max(mn,Math.min(mx,v));
+  return(
+    <div style={{marginBottom:24}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+        <label style={{fontSize:14,color:MU,fontWeight:600}}>{label}</label>
+        <div style={{display:'flex',alignItems:'center',gap:6}}>
+          <button className="stepper-btn" onClick={()=>setLoc(l=>({...l,[k]:clamp(l[k]-st)}))}>
+            <i className="ti ti-minus" style={{fontSize:16}}/>
+          </button>
+          <input type="number" value={loc[k]} min={mn} max={mx} step={st}
+            onChange={e=>{const v=+e.target.value;if(!isNaN(v))setLoc(l=>({...l,[k]:clamp(v)}));}}
+            style={{width:88,textAlign:'center',fontSize:18,fontWeight:800,color:c,padding:'10px 4px',minHeight:50}}/>
+          <span style={{fontSize:12,color:MU,fontWeight:600,marginLeft:-2,marginRight:2}}>{u}</span>
+          <button className="stepper-btn" onClick={()=>setLoc(l=>({...l,[k]:clamp(l[k]+st)}))}>
+            <i className="ti ti-plus" style={{fontSize:16}}/>
+          </button>
+        </div>
+      </div>
+      <input type="range" min={mn} max={mx} step={st} value={loc[k]} style={{accentColor:c,width:'100%'}} onChange={e=>setLoc(l=>({...l,[k]:+e.target.value}))}/>
+    </div>
+  );
 }
 
 function Ring({consumed,goal,ac}){
-  const r=72,cx=90,cy=90,circ=2*Math.PI*r;
-  const pct=Math.min(1,consumed/goal),over=consumed>goal,color=over?CORAL:ac;
+  const r=68,cx=86,cy=86,circ=2*Math.PI*r;
+  const pct=Math.min(1,consumed/goal),over=consumed>goal,color=over?PINK:ac;
   return(
-    <svg width="180" height="180" viewBox="0 0 180 180" style={{display:'block',margin:'0 auto'}}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={DIM} strokeWidth="8"/>
-      {consumed>0&&<circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth="8"
+    <svg width="172" height="172" viewBox="0 0 172 172" style={{display:'block',margin:'0 auto'}}>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={DIM} strokeWidth="10"/>
+      {consumed>0&&<circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth="10"
         strokeDasharray={`${pct*circ} ${circ}`} strokeLinecap="round" transform={`rotate(-90 ${cx} ${cy})`}/>}
-      <text x={cx} y={cy-14} textAnchor="middle" fill={TX} fontSize="38" fontWeight="700" fontFamily="Space Grotesk">{Math.round(consumed)}</text>
-      <text x={cx} y={cy+8} textAnchor="middle" fill={MU} fontSize="12" fontFamily="Space Grotesk">kcal eaten</text>
-      <text x={cx} y={cy+26} textAnchor="middle" fill={color} fontSize="13" fontWeight="600" fontFamily="Space Grotesk">
+      <text x={cx} y={cx-14} textAnchor="middle" fill={TX} fontSize="36" fontWeight="800" fontFamily="Space Grotesk">{Math.round(consumed)}</text>
+      <text x={cx} y={cx+7} textAnchor="middle" fill={MU} fontSize="12" fontFamily="Space Grotesk" fontWeight="600">kcal eaten</text>
+      <text x={cx} y={cx+25} textAnchor="middle" fill={color} fontSize="13" fontWeight="700" fontFamily="Space Grotesk">
         {over?`${Math.round(consumed-goal)} over`:`${Math.round(goal-consumed)} to go`}
       </text>
     </svg>
@@ -91,15 +165,15 @@ function MB({label,val,goal,color}){
   const pct=Math.min(100,Math.round(val/goal*100));
   return(
     <div style={{marginBottom:16}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:7}}>
-        <span style={{fontSize:11,fontWeight:600,color:MU,textTransform:'uppercase',letterSpacing:'0.08em'}}>{label}</span>
-        <div style={{display:'flex',alignItems:'baseline',gap:3}}>
-          <span style={{fontSize:17,fontWeight:700,color:TX}}>{Math.round(val)}</span>
-          <span style={{fontSize:12,color:MU,fontWeight:400}}>/{goal}g</span>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+        <span style={{fontSize:11,fontWeight:700,color:MU,textTransform:'uppercase',letterSpacing:'0.1em'}}>{label}</span>
+        <div>
+          <span style={{fontSize:18,fontWeight:800,color:TX}}>{Math.round(val)}</span>
+          <span style={{fontSize:12,color:MU,fontWeight:500}}>/{goal}g</span>
         </div>
       </div>
-      <div style={{height:6,borderRadius:3,background:DIM}}>
-        <div style={{height:'100%',borderRadius:3,background:color,width:`${pct}%`,transition:'width 0.4s'}}/>
+      <div style={{height:8,borderRadius:4,background:DIM}}>
+        <div style={{height:'100%',borderRadius:4,background:color,width:`${pct}%`,transition:'width 0.4s'}}/>
       </div>
     </div>
   );
@@ -108,10 +182,10 @@ function MB({label,val,goal,color}){
 function NG({calories,protein,carbs,fat}){
   return(
     <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:16}}>
-      {[['kcal',Math.round(calories),CORAL],['P',Math.round(protein),MINT],['C',Math.round(carbs),BLUE],['F',Math.round(fat),AMBER]].map(([l,v,c])=>(
-        <div key={l} style={{textAlign:'center',background:RZ,borderRadius:12,padding:'10px 0',border:`0.5px solid ${h(c,0.2)}`}}>
-          <div style={{fontSize:17,fontWeight:700,color:c}}>{v}</div>
-          <div style={{fontSize:11,color:MU,marginTop:2,fontWeight:500}}>{l}</div>
+      {[['kcal',Math.round(calories),PINK,ON_PINK],['P',Math.round(protein),CYAN,ON_CYAN],['C',Math.round(carbs),BLUE,ON_BLUE],['F',Math.round(fat),AMBER,ON_AMBER]].map(([l,v,bg,tc])=>(
+        <div key={l} style={{textAlign:'center',background:bg,borderRadius:14,padding:'10px 0'}}>
+          <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
+          <div style={{fontSize:11,color:tc,marginTop:2,fontWeight:700,opacity:0.7}}>{l}</div>
         </div>
       ))}
     </div>
@@ -121,15 +195,15 @@ function NG({calories,protein,carbs,fat}){
 function WeekBars({foods,goal,ac}){
   const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));return d;});
   const data=days.map(d=>({lbl:d.toLocaleDateString('en',{weekday:'narrow'}),cal:foods.filter(f=>ds(f.ts)===d.toDateString()).reduce((s,f)=>s+f.calories,0),now:d.toDateString()===tod()}));
-  const mx=Math.max(goal*1.3,...data.map(d=>d.cal),1),H=90,bw=28,gap=12;
+  const mx=Math.max(goal*1.3,...data.map(d=>d.cal),1),H=100,bw=28,gap=12;
   return(
     <svg viewBox={`0 0 280 ${H+22}`} width="100%">
-      <line x1="0" y1={H-(goal/mx)*H} x2="280" y2={H-(goal/mx)*H} stroke={ac} strokeWidth="1" strokeDasharray="4,3" opacity="0.25"/>
-      {data.map((d,i)=>{const x=i*(bw+gap)+4,hh=Math.round((d.cal/mx)*H),over=d.cal>goal;return(
+      <line x1="0" y1={H-(goal/mx)*H} x2="280" y2={H-(goal/mx)*H} stroke={ac} strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4"/>
+      {data.map((d,i)=>{const x=i*(bw+gap)+4,hh=Math.round((d.cal/mx)*H),over=d.cal>goal,c=over?PINK:ac;return(
         <g key={i}>
-          <rect x={x} y={0} width={bw} height={H} fill={DIM} rx="6"/>
-          {d.cal>0&&<rect x={x} y={H-hh} width={bw} height={hh} fill={over?CORAL:ac} rx="6" opacity={d.now?1:0.55}/>}
-          <text x={x+bw/2} y={H+15} textAnchor="middle" fill={d.now?TX:MU} fontSize="10" fontWeight={d.now?'700':'400'}>{d.lbl}</text>
+          <rect x={x} y={0} width={bw} height={H} fill={DIM} rx="8"/>
+          {d.cal>0&&<rect x={x} y={H-hh} width={bw} height={hh} fill={c} rx="8" opacity={d.now?1:0.5}/>}
+          <text x={x+bw/2} y={H+15} textAnchor="middle" fill={d.now?TX:MU} fontSize="10" fontWeight={d.now?'700':'500'}>{d.lbl}</text>
         </g>
       );})}
     </svg>
@@ -143,42 +217,44 @@ function WtLine({log}){
   const c=pts.map((e,i)=>({x:(i/(pts.length-1))*(W-16)+8,y:H-((e.weight-mn)/(mx-mn))*(H-12)-6}));
   return(
     <svg viewBox={`0 0 ${W} ${H+20}`} width="100%">
-      <polyline points={c.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={BLUE} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      {c.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={i===c.length-1?5:3} fill={BLUE} opacity={i===c.length-1?1:0.5}/>)}
-      <text x="8" y={H+16} fill={MU} fontSize="10">{new Date(pts[0].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
-      <text x={W-8} y={H+16} fill={MU} fontSize="10" textAnchor="end">{new Date(pts[pts.length-1].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
+      <polyline points={c.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={BLUE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      {c.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={i===c.length-1?6:3} fill={BLUE} opacity={i===c.length-1?1:0.45}/>)}
+      <text x="8" y={H+16} fill={MU} fontSize="10" fontWeight="600">{new Date(pts[0].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
+      <text x={W-8} y={H+16} fill={MU} fontSize="10" textAnchor="end" fontWeight="600">{new Date(pts[pts.length-1].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
     </svg>
+  );
+}
+
+function ColorChip({label,value,unit,bg,tc,neon}){
+  return(
+    <div className={neon} style={{background:bg,borderRadius:18,padding:'14px 8px',textAlign:'center'}}>
+      <div style={{fontSize:26,fontWeight:800,color:tc,lineHeight:1}}>{value}</div>
+      <div style={{fontSize:10,color:tc,marginTop:4,fontWeight:700,opacity:0.75,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</div>
+      <div style={{fontSize:10,color:tc,fontWeight:600,opacity:0.55,marginTop:1}}>{unit}</div>
+    </div>
   );
 }
 
 function Onboarding({onComplete}){
   const[name,setName]=useState('');
   const[loc,setLoc]=useState({calories:2000,protein:140,carbs:200,fat:65});
-  const flds=[['calories','daily calories','kcal',1000,4000,50,CORAL],['protein','protein goal','g',40,300,5,MINT],['carbs','carbs goal','g',50,500,5,BLUE],['fat','fat goal','g',20,150,5,AMBER]];
+  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,300,5,CYAN],['carbs','carbs','g',50,500,5,BLUE],['fat','fat','g',20,150,5,AMBER]];
   return(
     <div style={{minHeight:'100vh',background:BG,display:'flex',flexDirection:'column',justifyContent:'center',padding:'2rem 1.25rem'}}>
       <div style={{marginBottom:'2rem'}}>
-        <p style={{fontSize:28,fontWeight:700,color:TX,marginBottom:6}}>welcome 👋</p>
-        <p style={{fontSize:15,color:MU}}>let's get your tracker set up in 30 seconds.</p>
+        <p style={{fontSize:30,fontWeight:800,color:TX,marginBottom:8}}>welcome 👋</p>
+        <p style={{fontSize:15,color:MU,fontWeight:500}}>let's get you set up.</p>
       </div>
       <div className="card" style={{marginBottom:14}}>
         <span className="lbl">your name</span>
-        <input placeholder="e.g. Charlotte" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&onComplete(name.trim(),loc)}/>
+        <input value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&onComplete(name.trim(),loc)} autoComplete="given-name" style={{fontSize:18,fontWeight:700}}/>
       </div>
       <div className="card" style={{marginBottom:14}}>
         <span className="lbl">daily targets</span>
-        {flds.map(([k,lb,u,mn,mx,st,c])=>(
-          <div key={k} style={{marginBottom:20}}>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-              <label style={{fontSize:13,color:MU,fontWeight:500}}>{lb}</label>
-              <span style={{fontSize:15,fontWeight:700,color:c}}>{loc[k]}<span style={{fontSize:12,color:MU,fontWeight:400}}> {u}</span></span>
-            </div>
-            <input type="range" min={mn} max={mx} step={st} value={loc[k]} style={{accentColor:c}} onChange={e=>setLoc(l=>({...l,[k]:+e.target.value}))}/>
-          </div>
-        ))}
+        {flds.map(([k,lb,u,mn,mx,st,c])=><GoalField key={k} label={lb} k={k} u={u} mn={mn} mx={mx} st={st} c={c} loc={loc} setLoc={setLoc}/>)}
       </div>
       <button onClick={()=>onComplete(name.trim(),loc)} disabled={!name.trim()}
-        style={{width:'100%',padding:'14px',borderRadius:14,border:'none',background:MINT,color:'#08080F',fontSize:16,fontWeight:700,opacity:name.trim()?1:0.3}}>
+        style={{width:'100%',minHeight:58,borderRadius:18,border:'none',background:CYAN,color:ON_CYAN,fontSize:17,fontWeight:800,opacity:name.trim()?1:0.25,letterSpacing:'0.02em'}}>
         get started <i className="ti ti-arrow-right" style={{marginLeft:4,verticalAlign:-2}}/>
       </button>
     </div>
@@ -190,48 +266,48 @@ function FoodEntry({f,onDelete,onEdit}){
   const[v,setV]=useState({...f});
   const[confirmDel,setConfirmDel]=useState(false);
   if(confirmDel)return(
-    <div style={{background:h(CORAL,0.08),borderRadius:12,padding:'12px 14px',marginBottom:10,border:`0.5px solid ${h(CORAL,0.2)}`}}>
-      <p style={{fontSize:13,color:TX,fontWeight:500,marginBottom:10}}>Delete <span style={{color:CORAL}}>{f.name.length>35?f.name.slice(0,35)+'...':f.name}</span>?</p>
-      <div style={{display:'flex',gap:8}}>
-        <button className="btn sm dng" style={{fontWeight:700}} onClick={()=>onDelete(f.id)}>yes, delete</button>
-        <button className="btn sm ghost" onClick={()=>setConfirmDel(false)}>cancel</button>
+    <div style={{background:h(PINK,0.1),borderRadius:14,padding:'14px',marginBottom:12,border:`1px solid ${h(PINK,0.25)}`}}>
+      <p style={{fontSize:14,color:TX,fontWeight:600,marginBottom:12}}>Delete <span style={{color:PINK}}>{f.name.length>35?f.name.slice(0,35)+'...':f.name}</span>?</p>
+      <div style={{display:'flex',gap:10}}>
+        <button className="btn sm dng" style={{flex:1,fontWeight:800}} onClick={()=>onDelete(f.id)}>yes, delete</button>
+        <button className="btn sm ghost" style={{flex:1}} onClick={()=>setConfirmDel(false)}>cancel</button>
       </div>
     </div>
   );
   if(mode==='edit')return(
-    <div style={{borderBottom:`0.5px solid ${BDR}`,paddingBottom:14,marginBottom:14}}>
+    <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:16,marginBottom:16}}>
       <input value={v.name} onChange={e=>setV({...v,name:e.target.value})} style={{marginBottom:10}}/>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-        {[['calories','kcal',CORAL],['protein','g',MINT],['carbs','g',BLUE],['fat','g',AMBER]].map(([k,u,c])=>(
+        {[['calories','kcal',PINK],['protein','g',CYAN],['carbs','g',BLUE],['fat','g',AMBER]].map(([k,u,c])=>(
           <div key={k}>
-            <label style={{fontSize:11,color:c,fontWeight:600,display:'block',marginBottom:4,textTransform:'uppercase',letterSpacing:'0.05em'}}>{k} ({u})</label>
+            <label style={{fontSize:12,color:c,fontWeight:700,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.06em'}}>{k} ({u})</label>
             <input type="number" value={v[k]} min={0} onChange={e=>setV({...v,[k]:+e.target.value})}/>
           </div>
         ))}
       </div>
       <input value={v.serving} onChange={e=>setV({...v,serving:e.target.value})} placeholder="serving description" style={{marginBottom:10}}/>
-      <div style={{display:'flex',gap:8}}>
-        <button className="btn sm" style={{flex:1,background:MINT,color:'#08080F',border:'none',fontWeight:700}} onClick={()=>{onEdit(v);setMode('view');}}>save changes</button>
-        <button className="btn sm ghost" onClick={()=>{setV({...f});setMode('view');}}>cancel</button>
+      <div style={{display:'flex',gap:10}}>
+        <button className="btn sm" style={{flex:1,background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:48}} onClick={()=>{onEdit(v);setMode('view');}}>save</button>
+        <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>{setV({...f});setMode('view');}}>cancel</button>
       </div>
     </div>
   );
   return(
-    <div style={{borderBottom:`0.5px solid ${BDR}`,paddingBottom:10,marginBottom:10}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
-        <p style={{color:TX,fontWeight:600,flex:1,marginRight:8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14}}>{f.name}</p>
+    <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:12,marginBottom:12}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
+        <p style={{color:TX,fontWeight:700,flex:1,marginRight:8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14}}>{f.name}</p>
         <div style={{display:'flex',gap:4,flexShrink:0}}>
-          <button className="btn ghost sm" style={{padding:'2px 7px'}} onClick={()=>setMode('edit')}><i className="ti ti-edit" style={{fontSize:12}}/></button>
-          <button className="btn dng sm" style={{padding:'2px 7px'}} onClick={()=>setConfirmDel(true)}><i className="ti ti-trash" style={{fontSize:12}}/></button>
+          <button className="icon-btn btn ghost" onClick={()=>setMode('edit')}><i className="ti ti-edit" style={{fontSize:16}}/></button>
+          <button className="icon-btn btn dng" onClick={()=>setConfirmDel(true)}><i className="ti ti-trash" style={{fontSize:16}}/></button>
         </div>
       </div>
-      <div style={{display:'flex',gap:12,fontSize:12}}>
-        <span style={{color:CORAL,fontWeight:700}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:400}}> kcal</span></span>
-        <span style={{color:MINT,fontWeight:600}}>{Math.round(f.protein)}g P</span>
-        <span style={{color:BLUE,fontWeight:600}}>{Math.round(f.carbs)}g C</span>
-        <span style={{color:AMBER,fontWeight:600}}>{Math.round(f.fat)}g F</span>
+      <div style={{display:'flex',gap:10,fontSize:13,flexWrap:'wrap'}}>
+        <span style={{color:PINK,fontWeight:800}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:500}}> kcal</span></span>
+        <span style={{color:CYAN,fontWeight:700}}>{Math.round(f.protein)}g P</span>
+        <span style={{color:BLUE,fontWeight:700}}>{Math.round(f.carbs)}g C</span>
+        <span style={{color:AMBER,fontWeight:700}}>{Math.round(f.fat)}g F</span>
       </div>
-      <p style={{fontSize:11,color:DIM,marginTop:3,fontStyle:'italic'}}>{f.serving}</p>
+      <p style={{fontSize:12,color:DIM,marginTop:4,fontStyle:'italic',fontWeight:500}}>{f.serving}</p>
     </div>
   );
 }
@@ -243,61 +319,66 @@ function Dashboard({foods,workouts,weightLog,goals,setWeightLog,ac,streak}){
   const tw=workouts.filter(w=>ds(w.ts)===tod());
   const lw=[...weightLog].sort((a,b)=>b.ts-a.ts)[0]?.weight;
   const logW=()=>{const w=parseFloat(wi);if(!w||w<20||w>300)return;setWeightLog(l=>[...l,{id:Date.now(),ts:Date.now(),weight:w}]);setWi('');};
+  const calLeft=goals.calories-Math.round(tot.cal);
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'0 2px',marginBottom:2}}>
-        <p style={{fontSize:18,fontWeight:700,color:TX}}>hey, {goals.name} 👋</p>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'2px 2px'}}>
+        <p style={{fontSize:20,fontWeight:800,color:TX}}>hey, {goals.name}</p>
         {streak>0&&(
-          <div style={{display:'flex',alignItems:'center',gap:5,background:h(ac,0.12),padding:'5px 12px',borderRadius:100,border:`0.5px solid ${h(ac,0.25)}`}}>
-            <i className="ti ti-flame" style={{fontSize:14,color:ac}}/>
-            <span style={{fontSize:12,fontWeight:700,color:ac}}>{streak} day{streak!==1?'s':''}</span>
+          <div style={{display:'flex',alignItems:'center',gap:6,background:h(ac,0.15),padding:'7px 14px',borderRadius:100,border:`1px solid ${h(ac,0.3)}`}}>
+            <i className="ti ti-flame" style={{fontSize:15,color:ac}}/>
+            <span style={{fontSize:13,fontWeight:800,color:ac}}>{streak} day{streak!==1?'s':''}</span>
           </div>
         )}
       </div>
-      <div className="card" style={{textAlign:'center',paddingTop:'1.5rem',paddingBottom:'1.5rem'}}>
+
+      {/* calorie ring card */}
+      <div className="card" style={{textAlign:'center',paddingTop:'1.5rem',paddingBottom:'1.5rem',background:'linear-gradient(135deg,rgba(191,90,242,0.14) 0%,rgba(10,132,255,0.1) 50%,rgba(255,55,95,0.1) 100%)',border:'1px solid rgba(191,90,242,0.2)'}}>
         <Ring consumed={tot.cal} goal={goals.calories} ac={ac}/>
-        <div style={{height:1,background:BDR,margin:'1.25rem 0'}}/>
-        <MB label="protein" val={tot.pro} goal={goals.protein} color={MINT}/>
+        <div style={{height:1,background:'rgba(255,255,255,0.08)',margin:'1.25rem 0'}}/>
+        <MB label="protein" val={tot.pro} goal={goals.protein} color={CYAN}/>
         <MB label="carbs" val={tot.carbs} goal={goals.carbs} color={BLUE}/>
         <MB label="fat" val={tot.fat} goal={goals.fat} color={AMBER}/>
       </div>
+
+      {/* color blocking stat chips */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-        {[['remaining',Math.max(0,goals.calories-Math.round(tot.cal)),'kcal',CORAL],['sessions',tw.length,'today',PURPLE],['weight',lw??'--','kg',BLUE]].map(([l,v,u,c])=>(
-          <div key={l} style={{background:SF,border:`0.5px solid ${BDR}`,borderRadius:16,padding:'14px 8px',textAlign:'center'}}>
-            <div style={{fontSize:24,fontWeight:700,color:c}}>{v}</div>
-            <div style={{fontSize:11,color:MU,marginTop:3,fontWeight:500}}>{l}</div>
-            <div style={{fontSize:10,color:DIM}}>{u}</div>
-          </div>
-        ))}
+        <ColorChip label="remaining" value={Math.max(0,calLeft)} unit="kcal" bg={PINK} tc={ON_PINK} neon="neon-pink"/>
+        <ColorChip label="sessions" value={tw.length} unit="today" bg={VIOLET} tc={ON_VIOLET} neon="neon-violet"/>
+        <ColorChip label="weight" value={lw??'--'} unit="kg" bg={CYAN} tc={ON_CYAN} neon="neon-cyan"/>
       </div>
+
+      {/* log weight */}
       <div className="card">
         <span className="lbl">log weight</span>
         <div style={{display:'flex',gap:8,alignItems:'center'}}>
-          <input type="number" placeholder="e.g. 72.5" value={wi} onChange={e=>setWi(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logW()} step="0.1" style={{flex:1}}/>
-          <span style={{color:MU,fontSize:13,whiteSpace:'nowrap',fontWeight:500}}>kg</span>
-          <button className="btn sm" style={{background:ac,color:'#08080F',border:'none',fontWeight:700}} onClick={logW} disabled={!wi}>log</button>
+          <input type="number" value={wi} onChange={e=>setWi(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logW()} step="0.1" inputMode="decimal" style={{flex:1}}/>
+          <span style={{color:MU,fontSize:14,whiteSpace:'nowrap',fontWeight:600}}>kg</span>
+          <button className="btn sm" style={{background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:50,padding:'10px 18px'}} onClick={logW} disabled={!wi}>log</button>
         </div>
       </div>
+
       {tf.length>0&&(
-        <div className="card" style={{borderLeft:`3px solid ${CORAL}`}}>
+        <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
           <span className="lbl">food today</span>
           {tf.slice(-5).map(f=>(
-            <div key={f.id} style={{display:'flex',justifyContent:'space-between',fontSize:13,paddingBottom:8,marginBottom:8,borderBottom:`0.5px solid ${BDR}`}}>
-              <span style={{color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,marginRight:8,fontWeight:600}}>{f.name}</span>
-              <span style={{color:CORAL,fontWeight:700,whiteSpace:'nowrap'}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:400,fontSize:11}}> kcal</span></span>
+            <div key={f.id} style={{display:'flex',justifyContent:'space-between',fontSize:14,paddingBottom:10,marginBottom:10,borderBottom:`1px solid ${BDR}`}}>
+              <span style={{color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,marginRight:8,fontWeight:700}}>{f.name}</span>
+              <span style={{color:PINK,fontWeight:800,whiteSpace:'nowrap'}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
             </div>
           ))}
-          {tf.length>5&&<p style={{fontSize:12,color:MU,textAlign:'center'}}>+{tf.length-5} more</p>}
+          {tf.length>5&&<p style={{fontSize:12,color:MU,textAlign:'center',fontWeight:600}}>+{tf.length-5} more</p>}
         </div>
       )}
+
       {tw.length>0&&(
-        <div className="card" style={{borderLeft:`3px solid ${PURPLE}`}}>
+        <div className="card" style={{borderLeft:`4px solid ${VIOLET}`}}>
           <span className="lbl">training today</span>
           {tw.map(w=>(
-            <div key={w.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:14,marginBottom:8}}>
-              <span style={{color:TX,fontWeight:600}}>{w.exercise}</span>
-              <div style={{display:'flex',gap:5}}>
-                <span className="pill" style={{background:h(PURPLE,0.15),color:PURPLE}}>{w.muscle}</span>
+            <div key={w.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:14,marginBottom:10}}>
+              <span style={{color:TX,fontWeight:700}}>{w.exercise}</span>
+              <div style={{display:'flex',gap:6}}>
+                <span className="pill" style={{background:h(VIOLET,0.2),color:VIOLET}}>{w.muscle}</span>
                 <span className="pill">{w.sets.length}s</span>
               </div>
             </div>
@@ -308,7 +389,7 @@ function Dashboard({foods,workouts,weightLog,goals,setWeightLog,ac,streak}){
   );
 }
 
-function TrainTab({workouts,setWorkouts,templates,setTemplates,ac}){
+function TrainTab({workouts,setWorkouts,templates,setTemplates}){
   const[ex,setEx]=useState('');const[ms,setMs]=useState('chest');
   const[sets,setSets]=useState([{reps:10,weight:60}]);
   const[notes,setNotes]=useState('');const[showT,setShowT]=useState(false);
@@ -325,48 +406,53 @@ function TrainTab({workouts,setWorkouts,templates,setTemplates,ac}){
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
       {templates.length>0&&(
         <div>
-          <button className="btn ghost sm" style={{color:PURPLE}} onClick={()=>setShowT(s=>!s)}>
-            <i className="ti ti-template" style={{marginRight:5,fontSize:14,verticalAlign:-2}}/>{showT?'hide templates':'load template'}
+          <button className="btn ghost sm" style={{color:VIOLET,minHeight:44}} onClick={()=>setShowT(s=>!s)}>
+            <i className="ti ti-template" style={{fontSize:15,verticalAlign:-2}}/>{showT?'hide templates':'load template'}
           </button>
           {showT&&(
             <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
               {templates.map(t=>(
-                <div key={t.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:SF,border:`0.5px solid ${BDR}`,borderRadius:14,padding:'10px 14px',borderLeft:`3px solid ${PURPLE}`}}>
-                  <div><span style={{fontSize:14,color:TX,fontWeight:600}}>{t.name}</span><span style={{fontSize:12,color:MU,marginLeft:8}}>{t.exercise} &middot; {t.sets.length}s</span></div>
-                  <div style={{display:'flex',gap:6}}><button className="btn sm" onClick={()=>loadT(t)}>load</button><button className="btn sm dng" onClick={()=>setTemplates(ts=>ts.filter(x=>x.id!==t.id))}><i className="ti ti-x" style={{fontSize:12}}/></button></div>
+                <div key={t.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:SF,border:`1px solid ${BDR}`,borderRadius:16,padding:'12px 14px',borderLeft:`4px solid ${VIOLET}`}}>
+                  <div><span style={{fontSize:14,color:TX,fontWeight:700}}>{t.name}</span><span style={{fontSize:12,color:MU,marginLeft:8,fontWeight:500}}>{t.exercise} &middot; {t.sets.length}s</span></div>
+                  <div style={{display:'flex',gap:8}}>
+                    <button className="btn sm" style={{minHeight:42}} onClick={()=>loadT(t)}>load</button>
+                    <button className="btn sm dng" style={{minHeight:42}} onClick={()=>setTemplates(ts=>ts.filter(x=>x.id!==t.id))}><i className="ti ti-x" style={{fontSize:14}}/></button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       )}
-      <div className="card" style={{borderLeft:`3px solid ${PURPLE}`}}>
+      <div className="card" style={{borderLeft:`4px solid ${VIOLET}`}}>
         <span className="lbl">log exercise</span>
         <div style={{display:'flex',gap:8,marginBottom:12}}>
           <input placeholder="Exercise name" value={ex} onChange={e=>setEx(e.target.value)} style={{flex:1}}/>
-          <select value={ms} onChange={e=>setMs(e.target.value)} style={{width:'auto',minWidth:108}}>{MG.map(m=><option key={m}>{m}</option>)}</select>
+          <select value={ms} onChange={e=>setMs(e.target.value)} style={{width:'auto',minWidth:110}}>{MG.map(m=><option key={m}>{m}</option>)}</select>
         </div>
-        <div style={{display:'flex',flexDirection:'column',gap:9,marginBottom:12}}>
+        <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:12}}>
           {sets.map((s,i)=>(
             <div key={i} style={{display:'flex',gap:8,alignItems:'center'}}>
-              <span style={{fontSize:12,color:PURPLE,fontWeight:700,minWidth:28}}>S{i+1}</span>
-              <input type="number" value={s.reps} min={1} onChange={e=>upd(i,'reps',+e.target.value)} style={{width:62,textAlign:'center'}}/>
-              <span style={{fontSize:13,color:DIM,fontWeight:500}}>x</span>
-              <input type="number" value={s.weight} min={0} step={2.5} onChange={e=>upd(i,'weight',+e.target.value)} style={{width:68,textAlign:'center'}}/>
-              <span style={{fontSize:12,color:DIM,fontWeight:500}}>kg</span>
-              {sets.length>1&&<button className="btn ghost sm" style={{padding:'3px 5px'}} onClick={()=>rmS(i)}><i className="ti ti-minus" style={{fontSize:12}}/></button>}
+              <span style={{fontSize:13,color:VIOLET,fontWeight:800,minWidth:30,flexShrink:0}}>S{i+1}</span>
+              <input type="number" value={s.reps} min={1} inputMode="numeric" onChange={e=>upd(i,'reps',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
+              <span style={{fontSize:14,color:DIM,fontWeight:700,flexShrink:0}}>x</span>
+              <input type="number" value={s.weight} min={0} step={2.5} inputMode="decimal" onChange={e=>upd(i,'weight',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
+              <span style={{fontSize:12,color:DIM,fontWeight:600,flexShrink:0}}>kg</span>
+              {sets.length>1&&<button className="icon-btn btn ghost" onClick={()=>rmS(i)}><i className="ti ti-minus" style={{fontSize:15}}/></button>}
             </div>
           ))}
         </div>
-        <button className="btn ghost sm" style={{marginBottom:12,color:PURPLE}} onClick={addS}><i className="ti ti-plus" style={{fontSize:13,marginRight:4,verticalAlign:-2}}/>add set</button>
-        <input placeholder="Notes" value={notes} onChange={e=>setNotes(e.target.value)} style={{marginBottom:12}}/>
+        <button className="btn ghost sm" style={{marginBottom:12,color:VIOLET,minHeight:44}} onClick={addS}>
+          <i className="ti ti-plus" style={{fontSize:14,verticalAlign:-2}}/>add set
+        </button>
+        <input placeholder="Notes (optional)" value={notes} onChange={e=>setNotes(e.target.value)} style={{marginBottom:12}}/>
         <div style={{display:'flex',gap:8}}>
-          <button className="btn" style={{flex:1,background:PURPLE,color:'#fff',border:'none',fontWeight:700}} onClick={save} disabled={!ex.trim()}>save exercise</button>
-          <button className="btn sm" onClick={()=>setSavT(s=>!s)} title="Save as template"><i className="ti ti-bookmark" style={{fontSize:15,verticalAlign:-2}}/></button>
+          <button className="btn" style={{flex:1,background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800}} onClick={save} disabled={!ex.trim()}>save exercise</button>
+          <button className="btn sm" style={{minHeight:50,padding:'10px 14px'}} onClick={()=>setSavT(s=>!s)} title="Save as template"><i className="ti ti-bookmark" style={{fontSize:18,verticalAlign:-2}}/></button>
         </div>
         {savT&&(<div style={{marginTop:12,display:'flex',gap:8}}>
           <input placeholder="Template name" value={tName} onChange={e=>setTName(e.target.value)} style={{flex:1}}/>
-          <button className="btn sm" style={{background:PURPLE,color:'#fff',border:'none',fontWeight:700}} onClick={saveTpl} disabled={!tName.trim()}>save</button>
+          <button className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,minHeight:50}} onClick={saveTpl} disabled={!tName.trim()}>save</button>
         </div>)}
       </div>
       {tw.length>0&&(
@@ -375,24 +461,24 @@ function TrainTab({workouts,setWorkouts,templates,setTemplates,ac}){
           {tw.map(w=>(
             <div key={w.id}>
               {delConfirm===w.id?(
-                <div style={{background:h(CORAL,0.08),borderRadius:12,padding:'10px 12px',marginBottom:12,border:`0.5px solid ${h(CORAL,0.2)}`}}>
-                  <p style={{fontSize:13,color:TX,fontWeight:500,marginBottom:8}}>Delete <span style={{color:CORAL}}>{w.exercise}</span>?</p>
-                  <div style={{display:'flex',gap:8}}>
-                    <button className="btn sm dng" onClick={()=>{setWorkouts(ws=>ws.filter(x=>x.id!==w.id));setDelConfirm(null);}}>yes, delete</button>
-                    <button className="btn sm ghost" onClick={()=>setDelConfirm(null)}>cancel</button>
+                <div style={{background:h(PINK,0.1),borderRadius:14,padding:'14px',marginBottom:12,border:`1px solid ${h(PINK,0.25)}`}}>
+                  <p style={{fontSize:14,color:TX,fontWeight:600,marginBottom:12}}>Delete <span style={{color:PINK}}>{w.exercise}</span>?</p>
+                  <div style={{display:'flex',gap:10}}>
+                    <button className="btn sm dng" style={{flex:1,fontWeight:800,minHeight:48}} onClick={()=>{setWorkouts(ws=>ws.filter(x=>x.id!==w.id));setDelConfirm(null);}}>yes, delete</button>
+                    <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>setDelConfirm(null)}>cancel</button>
                   </div>
                 </div>
               ):(
-                <div style={{borderBottom:`0.5px solid ${BDR}`,paddingBottom:12,marginBottom:12}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
-                    <span style={{fontWeight:700,fontSize:15,color:TX}}>{w.exercise}</span>
-                    <div style={{display:'flex',gap:5,alignItems:'center'}}>
-                      <span className="pill" style={{background:h(PURPLE,0.15),color:PURPLE}}>{w.muscle}</span>
-                      <button className="btn dng sm" style={{padding:'2px 7px'}} onClick={()=>setDelConfirm(w.id)}><i className="ti ti-trash" style={{fontSize:12}}/></button>
+                <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:12,marginBottom:12}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                    <span style={{fontWeight:800,fontSize:15,color:TX}}>{w.exercise}</span>
+                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                      <span className="pill" style={{background:h(VIOLET,0.2),color:VIOLET}}>{w.muscle}</span>
+                      <button className="icon-btn btn dng" onClick={()=>setDelConfirm(w.id)}><i className="ti ti-trash" style={{fontSize:16}}/></button>
                     </div>
                   </div>
-                  <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>{w.sets.map((s,i)=><span key={i} className="pill" style={{fontWeight:600}}>{s.reps}x{s.weight}kg</span>)}</div>
-                  {w.notes&&<p style={{fontSize:12,color:MU,marginTop:5,fontStyle:'italic'}}>{w.notes}</p>}
+                  <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>{w.sets.map((s,i)=><span key={i} className="pill" style={{fontWeight:700}}>{s.reps}x{s.weight}kg</span>)}</div>
+                  {w.notes&&<p style={{fontSize:12,color:MU,marginTop:6,fontStyle:'italic'}}>{w.notes}</p>}
                 </div>
               )}
             </div>
@@ -421,33 +507,34 @@ function OFFSearch({onAdd}){
   return(
     <div>
       <div style={{display:'flex',gap:8,marginBottom:12}}>
-        <input value={q} onChange={e=>{setQ(e.target.value);setSel(null);setRes([]);}} onKeyDown={e=>e.key==='Enter'&&search()} placeholder="Product name or barcode number"/>
-        <button className="btn sm" style={{background:BLUE,color:'#fff',border:'none',fontWeight:700,flexShrink:0,minWidth:42}} onClick={search} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:<i className="ti ti-search"/>}</button>
+        <input value={q} onChange={e=>{setQ(e.target.value);setSel(null);setRes([]);}} onKeyDown={e=>e.key==='Enter'&&search()} placeholder="product name or barcode"/>
+        <button className="btn sm" style={{background:BLUE,color:ON_BLUE,border:'none',fontWeight:800,flexShrink:0,minWidth:54,minHeight:50}} onClick={search} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:<i className="ti ti-search"/>}</button>
       </div>
-      {err&&<p style={{fontSize:13,color:CORAL,marginBottom:10,fontWeight:500}}>{err}</p>}
-      {!sel&&res.length>0&&(<div style={{display:'flex',flexDirection:'column',gap:7,marginBottom:12}}>
-        {res.map((p,i)=>{const n=nut(p,100);return(<button key={i} className="btn" style={{textAlign:'left',padding:'10px 14px'}} onClick={()=>setSel(p)}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div style={{flex:1,minWidth:0}}><p style={{fontSize:14,color:TX,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.product_name}</p>{p.brands&&<p style={{fontSize:11,color:MU,marginTop:1}}>{p.brands}</p>}</div>
-            <div style={{display:'flex',gap:5,marginLeft:8,flexShrink:0}}>
-              <span className="pill" style={{color:CORAL,background:h(CORAL,0.12),fontWeight:700}}>{n.calories}kcal</span>
-              <span className="pill" style={{color:MINT,background:h(MINT,0.12),fontWeight:700}}>{n.protein}g P</span>
+      {err&&<p style={{fontSize:13,color:PINK,marginBottom:10,fontWeight:600}}>{err}</p>}
+      {!sel&&res.length>0&&(<div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12}}>
+        {res.map((p,i)=>{const n=nut(p,100);return(
+          <button key={i} className="btn" style={{textAlign:'left',padding:'12px 14px',minHeight:58}} onClick={()=>setSel(p)}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',width:'100%'}}>
+              <div style={{flex:1,minWidth:0}}><p style={{fontSize:14,color:TX,fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.product_name}</p>{p.brands&&<p style={{fontSize:12,color:MU,marginTop:2,fontWeight:500}}>{p.brands}</p>}</div>
+              <div style={{display:'flex',gap:6,marginLeft:10,flexShrink:0}}>
+                <span style={{background:PINK,color:ON_PINK,borderRadius:100,padding:'3px 10px',fontSize:11,fontWeight:800}}>{n.calories}kcal</span>
+              </div>
             </div>
-          </div>
-        </button>);})}
+          </button>
+        );})}
       </div>)}
-      {sel&&(<div style={{background:RZ,borderRadius:14,padding:'14px 16px'}}>
+      {sel&&(<div style={{background:RZ,borderRadius:16,padding:'16px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
-          <div><p style={{fontWeight:700,fontSize:15,color:TX}}>{sel.product_name}</p>{sel.brands&&<p style={{fontSize:11,color:MU,marginTop:2}}>{sel.brands}</p>}</div>
-          <button className="btn ghost sm" onClick={()=>setSel(null)}>change</button>
+          <div><p style={{fontWeight:800,fontSize:15,color:TX}}>{sel.product_name}</p>{sel.brands&&<p style={{fontSize:12,color:MU,marginTop:2,fontWeight:500}}>{sel.brands}</p>}</div>
+          <button className="btn ghost sm" style={{minHeight:44,flexShrink:0}} onClick={()=>setSel(null)}>change</button>
         </div>
         <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:14}}>
-          <label style={{fontSize:13,color:MU,whiteSpace:'nowrap',fontWeight:500}}>serving</label>
-          <input type="number" value={qty} min={1} step={5} onChange={e=>setQty(+e.target.value)} style={{width:80,textAlign:'center'}}/>
-          <span style={{fontSize:13,color:MU,fontWeight:500}}>g</span>
+          <label style={{fontSize:14,color:MU,whiteSpace:'nowrap',fontWeight:600}}>serving</label>
+          <input type="number" value={qty} min={1} step={5} inputMode="numeric" onChange={e=>setQty(+e.target.value)} style={{flex:1,textAlign:'center'}}/>
+          <span style={{fontSize:14,color:MU,fontWeight:600,flexShrink:0}}>g</span>
         </div>
         <NG {...nut(sel,qty)}/>
-        <button className="btn" style={{width:'100%',background:CORAL,color:'#fff',border:'none',fontWeight:700}} onClick={doAdd}>add to log</button>
+        <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
       </div>)}
     </div>
   );
@@ -467,15 +554,15 @@ function AIEst({onAdd}){
   return(
     <div>
       <div style={{display:'flex',gap:8,marginBottom:res?12:0}}>
-        <textarea rows={2} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))run();}} placeholder="e.g. 180g grilled salmon, 300g sweet potato, drizzle of olive oil"/>
-        <button className="btn sm" style={{background:CORAL,color:'#fff',border:'none',fontWeight:700,alignSelf:'flex-start',flexShrink:0}} onClick={run} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:'go'}</button>
+        <textarea rows={3} value={q} onChange={e=>setQ(e.target.value)} placeholder="e.g. 180g grilled salmon, 300g sweet potato, drizzle of olive oil"/>
+        <button className="btn sm" style={{background:PINK,color:ON_PINK,border:'none',fontWeight:800,alignSelf:'flex-start',flexShrink:0,minHeight:50,padding:'12px 16px'}} onClick={run} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:'go'}</button>
       </div>
-      {err&&<p style={{fontSize:13,color:CORAL,marginTop:8,fontWeight:500}}>{err}</p>}
-      {res&&(<div style={{marginTop:12,background:RZ,borderRadius:14,padding:'14px 16px'}}>
-        <p style={{fontWeight:700,fontSize:15,color:TX,marginBottom:3}}>{res.name}</p>
-        <p style={{fontSize:12,color:MU,marginBottom:12,fontStyle:'italic'}}>{res.serving}</p>
+      {err&&<p style={{fontSize:13,color:PINK,marginTop:10,fontWeight:600}}>{err}</p>}
+      {res&&(<div style={{marginTop:14,background:RZ,borderRadius:16,padding:'16px'}}>
+        <p style={{fontWeight:800,fontSize:15,color:TX,marginBottom:3}}>{res.name}</p>
+        <p style={{fontSize:12,color:MU,marginBottom:12,fontStyle:'italic',fontWeight:500}}>{res.serving}</p>
         <NG calories={res.calories} protein={res.protein} carbs={res.carbs} fat={res.fat}/>
-        <button className="btn" style={{width:'100%',background:CORAL,color:'#fff',border:'none',fontWeight:700}} onClick={doAdd}>add to log</button>
+        <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
       </div>)}
     </div>
   );
@@ -500,34 +587,34 @@ function PhotoEst({onAdd}){
     <div>
       {!preview?(
         <label style={{display:'block',cursor:'pointer'}}>
-          <div style={{border:`2px dashed rgba(0,212,160,0.25)`,borderRadius:14,padding:'2rem 1rem',textAlign:'center',background:h(MINT,0.04)}}>
-            <i className="ti ti-camera" style={{fontSize:36,color:MINT,display:'block',marginBottom:8}}/>
-            <p style={{fontSize:14,color:MU,fontWeight:500}}>tap to upload or take a photo</p>
-            <p style={{fontSize:12,color:DIM,marginTop:4}}>works best with a clear shot of the plate</p>
+          <div style={{border:`2px dashed ${h(CYAN,0.4)}`,borderRadius:16,padding:'2.5rem 1rem',textAlign:'center',background:h(CYAN,0.06)}}>
+            <i className="ti ti-camera" style={{fontSize:42,color:CYAN,display:'block',marginBottom:10}}/>
+            <p style={{fontSize:15,color:MU,fontWeight:600}}>tap to upload or take a photo</p>
+            <p style={{fontSize:12,color:DIM,marginTop:5,fontWeight:500}}>works best with a clear shot of the plate</p>
           </div>
           <input type="file" accept="image/*" capture="environment" onChange={handleFile} style={{display:'none'}}/>
         </label>
       ):(
         <div>
           <div style={{position:'relative',marginBottom:12}}>
-            <img src={preview} alt="food" style={{width:'100%',borderRadius:14,maxHeight:220,objectFit:'cover',display:'block'}}/>
-            <button onClick={reset} style={{position:'absolute',top:8,right:8,background:'rgba(8,8,15,0.85)',border:'none',color:TX,borderRadius:10,padding:'6px 12px',fontSize:12,fontWeight:600}}>
-              <i className="ti ti-refresh" style={{marginRight:4,fontSize:12,verticalAlign:-1}}/>retake
+            <img src={preview} alt="food" style={{width:'100%',borderRadius:16,maxHeight:240,objectFit:'cover',display:'block'}}/>
+            <button onClick={reset} style={{position:'absolute',top:10,right:10,background:'rgba(6,6,18,0.88)',border:'none',color:TX,borderRadius:12,padding:'8px 14px',fontSize:13,fontWeight:700,minHeight:40}}>
+              <i className="ti ti-refresh" style={{marginRight:5,fontSize:13,verticalAlign:-1}}/>retake
             </button>
           </div>
-          {!res&&(<button className="btn" style={{width:'100%',background:MINT,color:'#08080F',border:'none',fontWeight:700}} onClick={run} disabled={load}>
-            {load?<><i className="ti ti-loader-2" style={{marginRight:6}}/>analysing...</>:<><i className="ti ti-sparkles" style={{marginRight:6,fontSize:14,verticalAlign:-2}}/>analyse photo</>}
+          {!res&&(<button className="btn" style={{width:'100%',background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:52}} onClick={run} disabled={load}>
+            {load?<><i className="ti ti-loader-2" style={{marginRight:6}}/>analysing...</>:<><i className="ti ti-sparkles" style={{marginRight:6,fontSize:15,verticalAlign:-2}}/>analyse photo</>}
           </button>)}
         </div>
       )}
-      {err&&<p style={{fontSize:13,color:CORAL,marginTop:10,fontWeight:500}}>{err}</p>}
-      {res&&(<div style={{marginTop:12,background:RZ,borderRadius:14,padding:'14px 16px'}}>
-        <p style={{fontWeight:700,fontSize:15,color:TX,marginBottom:3}}>{res.name}</p>
-        <p style={{fontSize:12,color:MU,marginBottom:12,fontStyle:'italic'}}>{res.serving}</p>
+      {err&&<p style={{fontSize:13,color:PINK,marginTop:12,fontWeight:600}}>{err}</p>}
+      {res&&(<div style={{marginTop:14,background:RZ,borderRadius:16,padding:'16px'}}>
+        <p style={{fontWeight:800,fontSize:15,color:TX,marginBottom:3}}>{res.name}</p>
+        <p style={{fontSize:12,color:MU,marginBottom:12,fontStyle:'italic',fontWeight:500}}>{res.serving}</p>
         <NG calories={res.calories} protein={res.protein} carbs={res.carbs} fat={res.fat}/>
-        <div style={{display:'flex',gap:8}}>
-          <button className="btn" style={{flex:1,background:CORAL,color:'#fff',border:'none',fontWeight:700}} onClick={doAdd}>add to log</button>
-          <button className="btn sm ghost" onClick={reset}>retake</button>
+        <div style={{display:'flex',gap:10}}>
+          <button className="btn" style={{flex:1,background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
+          <button className="btn sm ghost" style={{minHeight:52,padding:'10px 16px'}} onClick={reset}>retake</button>
         </div>
       </div>)}
     </div>
@@ -541,23 +628,23 @@ function FoodTab({foods,setFoods}){
   const onAdd=item=>setFoods(f=>[...f,item]);
   const onEdit=updated=>setFoods(fs=>fs.map(f=>f.id===updated.id?updated:f));
   const onDelete=id=>setFoods(fs=>fs.filter(f=>f.id!==id));
-  const MODES=[['product','ti-barcode','product',BLUE],['describe','ti-align-left','describe',CORAL],['photo','ti-camera','photo',MINT]];
+  const MODES=[['product','ti-barcode','product',BLUE,ON_BLUE],['describe','ti-align-left','describe',PINK,ON_PINK],['photo','ti-camera','photo',CYAN,ON_CYAN]];
   const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
   const yFoods=foods.filter(f=>ds(f.ts)===yesterday.toDateString());
-  const canCopyYesterday=yFoods.length>0&&tf.length===0;
-  const copyYesterday=()=>{const copied=yFoods.map(f=>({...f,id:Date.now()+Math.random(),ts:Date.now()}));setFoods(prev=>[...prev,...copied]);};
+  const canCopy=yFoods.length>0&&tf.length===0;
+  const copyYesterday=()=>setFoods(prev=>[...prev,...yFoods.map(f=>({...f,id:Date.now()+Math.random(),ts:Date.now()}))]);
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      {canCopyYesterday&&(
-        <button className="btn" style={{border:`0.5px solid ${h(MINT,0.3)}`,color:MINT,background:h(MINT,0.06),borderRadius:14,padding:'11px 16px',textAlign:'left',fontWeight:600}} onClick={copyYesterday}>
-          <i className="ti ti-copy" style={{marginRight:7,fontSize:15,verticalAlign:-2}}/>copy yesterday's log ({yFoods.length} item{yFoods.length!==1?'s':''})
+      {canCopy&&(
+        <button className="btn" style={{border:`1px solid ${h(CYAN,0.35)}`,color:CYAN,background:h(CYAN,0.08),borderRadius:16,padding:'14px 16px',textAlign:'left',fontWeight:700,minHeight:54}} onClick={copyYesterday}>
+          <i className="ti ti-copy" style={{marginRight:8,fontSize:16,verticalAlign:-2}}/>copy yesterday's log ({yFoods.length} item{yFoods.length!==1?'s':''})
         </button>
       )}
-      <div className="card" style={{borderLeft:`3px solid ${CORAL}`}}>
-        <div style={{display:'flex',gap:0,marginBottom:16,background:RZ,borderRadius:12,padding:4}}>
-          {MODES.map(([m,ic,lb,c])=>(
-            <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:'8px 4px',fontSize:12,border:'none',background:mode===m?h(c,0.15):'transparent',borderRadius:10,color:mode===m?c:MU,fontWeight:mode===m?700:400,transition:'all 0.15s'}}>
-              <i className={`ti ${ic}`} style={{marginRight:4,fontSize:13,verticalAlign:-2}}/>{lb}
+      <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
+        <div style={{display:'flex',gap:0,marginBottom:16,background:RZ,borderRadius:14,padding:4}}>
+          {MODES.map(([m,ic,lb,c,tc])=>(
+            <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:'10px 4px',fontSize:13,border:'none',background:mode===m?c:'transparent',borderRadius:11,color:mode===m?tc:MU,fontWeight:mode===m?800:500,transition:'all 0.15s',minHeight:48,letterSpacing:mode===m?'0.01em':'normal'}}>
+              <i className={`ti ${ic}`} style={{marginRight:4,fontSize:14,verticalAlign:-2}}/>{lb}
             </button>
           ))}
         </div>
@@ -569,9 +656,9 @@ function FoodTab({foods,setFoods}){
         <div className="card">
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
             <span className="lbl" style={{marginBottom:0}}>today</span>
-            <div style={{display:'flex',gap:10}}>
-              <span style={{fontSize:13,fontWeight:700,color:CORAL}}>{Math.round(tot.cal)}<span style={{color:MU,fontWeight:400}}> kcal</span></span>
-              <span style={{fontSize:13,fontWeight:700,color:MINT}}>{Math.round(tot.pro)}<span style={{color:MU,fontWeight:400}}>g P</span></span>
+            <div style={{display:'flex',gap:12}}>
+              <span style={{fontSize:14,fontWeight:800,color:PINK}}>{Math.round(tot.cal)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
+              <span style={{fontSize:14,fontWeight:800,color:CYAN}}>{Math.round(tot.pro)}<span style={{color:MU,fontWeight:500,fontSize:12}}>g P</span></span>
             </div>
           </div>
           {tf.map(f=><FoodEntry key={f.id} f={f} onDelete={onDelete} onEdit={onEdit}/>)}
@@ -587,39 +674,32 @@ function ProgressTab({foods,workouts,weightLog,goals,ac}){
   const sw=[...weightLog].sort((a,b)=>b.ts-a.ts);
   const lw=sw[0]?.weight,fw=[...weightLog].sort((a,b)=>a.ts-b.ts)[0]?.weight;
   const delta=lw&&fw?(lw-fw).toFixed(1):null;
+  const trend=delta!=null?parseFloat(delta):null;
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
       <div className="card">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
           <span className="lbl" style={{marginBottom:0}}>calories this week</span>
-          <span style={{fontSize:11,color:DIM,fontWeight:500}}>-- = goal</span>
+          <span style={{fontSize:11,color:DIM,fontWeight:600}}>-- = goal</span>
         </div>
         <WeekBars foods={foods} goal={goals.calories} ac={ac}/>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-        <div style={{background:SF,border:`0.5px solid ${BDR}`,borderLeft:`3px solid ${PURPLE}`,borderRadius:16,padding:'16px 14px'}}>
-          <div style={{fontSize:30,fontWeight:700,color:PURPLE,marginBottom:3}}>{wk.length}</div>
-          <div style={{fontSize:12,color:MU,fontWeight:500}}>training sessions</div>
-          <div style={{fontSize:11,color:DIM}}>last 7 days</div>
-        </div>
-        <div style={{background:SF,border:`0.5px solid ${BDR}`,borderLeft:`3px solid ${BLUE}`,borderRadius:16,padding:'16px 14px'}}>
-          <div style={{fontSize:30,fontWeight:700,color:BLUE,marginBottom:3}}>{dLog}</div>
-          <div style={{fontSize:12,color:MU,fontWeight:500}}>days logged</div>
-          <div style={{fontSize:11,color:DIM}}>last 7 days</div>
-        </div>
+        <ColorChip label="training sessions" value={wk.length} unit="last 7 days" bg={VIOLET} tc={ON_VIOLET} neon="neon-violet"/>
+        <ColorChip label="days logged" value={dLog} unit="last 7 days" bg={BLUE} tc={ON_BLUE} neon="neon-blue"/>
       </div>
-      <div className="card" style={{borderLeft:`3px solid ${BLUE}`}}>
+      <div className="card" style={{borderLeft:`4px solid ${BLUE}`}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
           <span className="lbl" style={{marginBottom:0}}>weight trend</span>
-          {lw&&<span style={{fontSize:16,fontWeight:700,color:TX}}>{lw}kg{delta!=null&&<span style={{fontSize:13,marginLeft:7,color:parseFloat(delta)>0?CORAL:ac,fontWeight:600}}>{parseFloat(delta)>0?'+':''}{delta}kg</span>}</span>}
+          {lw&&<span style={{fontSize:17,fontWeight:800,color:TX}}>{lw}kg{trend!=null&&<span style={{fontSize:14,marginLeft:8,color:trend>0?PINK:LIME,fontWeight:800}}>{trend>0?'+':''}{delta}kg</span>}</span>}
         </div>
         <WtLine log={weightLog}/>
         {weightLog.length>0&&(
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginTop:14}}>
-            {[['highest',Math.max(...weightLog.map(e=>e.weight))+'kg',CORAL],['lowest',Math.min(...weightLog.map(e=>e.weight))+'kg',ac],['entries',weightLog.length,'']].map(([l,v,c])=>(
-              <div key={l} style={{textAlign:'center',background:RZ,borderRadius:12,padding:'10px 0'}}>
-                <div style={{fontSize:16,fontWeight:700,color:c||TX}}>{v}</div>
-                <div style={{fontSize:11,color:MU,fontWeight:500}}>{l}</div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginTop:14}}>
+            {[['highest',Math.max(...weightLog.map(e=>e.weight))+'kg',PINK,ON_PINK],['lowest',Math.min(...weightLog.map(e=>e.weight))+'kg',LIME,ON_LIME],['entries',weightLog.length,RZ,TX]].map(([l,v,bg,tc])=>(
+              <div key={l} style={{textAlign:'center',background:bg,border:bg===RZ?`1px solid ${BDR}`:'none',borderRadius:14,padding:'12px 0'}}>
+                <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
+                <div style={{fontSize:11,color:tc,fontWeight:700,opacity:bg===RZ?0.5:0.75,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
               </div>
             ))}
           </div>
@@ -633,54 +713,46 @@ function SettingsTab({goals,setGoals,ac}){
   const[loc,setLoc]=useState({...goals});const[ok,setOk]=useState(false);
   useEffect(()=>setLoc({...goals}),[goals]);
   const save=()=>{setGoals({...loc});setOk(true);setTimeout(()=>setOk(false),2000);};
-  const flds=[['calories','daily calories','kcal',1000,5000,50,CORAL],['protein','protein','g',40,350,5,MINT],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER]];
-  const accentOptions=[['mint','#00D4A0'],['coral','#FF6B6B'],['blue','#4D9EFF'],['purple','#9B7BFF'],['gold','#FFB347'],['rose','#FF6B9D']];
+  const flds=[['calories','daily calories','kcal',1000,5000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER]];
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
       <div className="card">
         <span className="lbl">profile</span>
         <div style={{marginBottom:14}}>
-          <label style={{fontSize:13,color:MU,fontWeight:500,display:'block',marginBottom:6}}>your name</label>
-          <input value={loc.name||''} onChange={e=>setLoc(l=>({...l,name:e.target.value}))} placeholder="Your name"/>
+          <label style={{fontSize:14,color:MU,fontWeight:600,display:'block',marginBottom:8}}>your name</label>
+          <input value={loc.name||''} onChange={e=>setLoc(l=>({...l,name:e.target.value}))} autoComplete="given-name"/>
         </div>
         <div>
-          <label style={{fontSize:13,color:MU,fontWeight:500,display:'block',marginBottom:6}}>app name</label>
-          <input value={loc.appName||''} onChange={e=>setLoc(l=>({...l,appName:e.target.value}))} placeholder="e.g. My Tracker"/>
+          <label style={{fontSize:14,color:MU,fontWeight:600,display:'block',marginBottom:8}}>app name</label>
+          <input value={loc.appName||''} onChange={e=>setLoc(l=>({...l,appName:e.target.value}))}/>
         </div>
       </div>
       <div className="card">
-        <span className="lbl">accent colour</span>
-        <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-          {accentOptions.map(([key,c])=>(
-            <button key={key} onClick={()=>setLoc(l=>({...l,accent:key}))} style={{
-              width:44,height:44,borderRadius:'50%',background:c,border:'none',
-              outline:loc.accent===key?`3px solid ${TX}`:'3px solid transparent',
-              outlineOffset:2,transition:'outline 0.15s',display:'flex',alignItems:'center',justifyContent:'center'
+        <span className="lbl">appearance</span>
+        <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:14,padding:4}}>
+          {[['dark','ti-moon','dark'],['light','ti-sun','light']].map(([val,ic,lbl])=>(
+            <button key={val} onClick={()=>setLoc(l=>({...l,theme:val}))} style={{
+              flex:1,padding:'12px 4px',fontSize:14,border:'none',
+              background:loc.theme===val?CYAN:'transparent',
+              borderRadius:11,color:loc.theme===val?ON_CYAN:MU,
+              fontWeight:loc.theme===val?800:500,transition:'all 0.18s',minHeight:50,
+              display:'flex',alignItems:'center',justifyContent:'center',gap:8
             }}>
-              {loc.accent===key&&<i className="ti ti-check" style={{fontSize:18,color:'#08080F'}}/>}
+              <i className={`ti ${ic}`} style={{fontSize:18}}/>{lbl} mode
             </button>
           ))}
         </div>
       </div>
       <div className="card">
         <span className="lbl">daily targets</span>
-        {flds.map(([k,lb,u,mn,mx,st,c])=>(
-          <div key={k} style={{marginBottom:22}}>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:14,marginBottom:10}}>
-              <label style={{color:MU,fontWeight:500}}>{lb}</label>
-              <span style={{color:c,fontWeight:700,fontSize:16}}>{loc[k]}<span style={{fontSize:12,color:MU,fontWeight:400}}> {u}</span></span>
-            </div>
-            <input type="range" min={mn} max={mx} step={st} value={loc[k]} style={{accentColor:c}} onChange={e=>setLoc(l=>({...l,[k]:+e.target.value}))}/>
-            <div style={{display:'flex',justifyContent:'space-between',fontSize:11,color:DIM,marginTop:5,fontWeight:500}}><span>{mn}</span><span>{mx}</span></div>
-          </div>
-        ))}
-        <button className="btn" style={{width:'100%',background:ac,color:'#08080F',border:'none',fontWeight:700}} onClick={save}>
-          {ok?<><i className="ti ti-check" style={{marginRight:5}}/>saved!</>:'save changes'}
+        {flds.map(([k,lb,u,mn,mx,st,c])=><GoalField key={k} label={lb} k={k} u={u} mn={mn} mx={mx} st={st} c={c} loc={loc} setLoc={setLoc}/>)}
+        <button className="btn" style={{width:'100%',background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:54,fontSize:16}} onClick={save}>
+          {ok?<><i className="ti ti-check" style={{marginRight:6}}/>saved!</>:'save changes'}
         </button>
       </div>
       <div className="card">
         <span className="lbl">about</span>
-        <p style={{fontSize:13,color:MU,lineHeight:1.8}}>Food data: <span style={{color:MINT,fontWeight:600}}>Open Food Facts</span> (open source, free). AI estimates and photo analysis: <span style={{color:PURPLE,fontWeight:600}}>Claude Sonnet</span>. Data saved to your browser's local storage.</p>
+        <p style={{fontSize:14,color:MU,lineHeight:1.8,fontWeight:500}}>Food data: <span style={{color:CYAN,fontWeight:700}}>Open Food Facts</span> (open source, free). AI estimates and photo analysis: <span style={{color:VIOLET,fontWeight:700}}>Claude Sonnet</span>. Your data saves locally to your device.</p>
       </div>
     </div>
   );
@@ -702,32 +774,51 @@ function App(){
   useEffect(()=>{if(rdy)stor.set('tpls',templates);},[templates,rdy]);
   useEffect(()=>{if(rdy)stor.set('goals',goals);},[goals,rdy]);
 
-  const ac=ACCENTS[goals.accent]||MINT;
+  const ac=CYAN;
   const streak=calcStreak(foods);
   const appName=goals.appName||'My Tracker';
-  const NAV=[['home','ti-layout-dashboard',ac],['train','ti-barbell',PURPLE],['food','ti-salad',CORAL],['progress','ti-chart-line',BLUE],['settings','ti-settings',AMBER]];
+  const isDark=goals.theme!=='light';
 
-  if(!rdy)return<div style={{background:BG,minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}><p style={{color:MU,fontSize:14,fontWeight:500}}>loading...</p></div>;
+  useEffect(()=>{
+    document.body.classList.toggle('light',!isDark);
+    return()=>document.body.classList.remove('light');
+  },[isDark]);
+
+  /* nav: each tab has its own electric color */
+  const NAV=[
+    ['home','ti-layout-dashboard',ac],
+    ['train','ti-barbell',VIOLET],
+    ['food','ti-salad',PINK],
+    ['progress','ti-chart-line',BLUE],
+    ['settings','ti-settings',AMBER]
+  ];
+
+  if(!rdy)return<div style={{background:BG,minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}><p style={{color:MU,fontSize:15,fontWeight:600}}>loading...</p></div>;
   if(!goals.name)return<Onboarding onComplete={(name,newGoals)=>setGoals(g=>({...g,...newGoals,name}))}/>;
 
   return(
     <div style={{background:BG,minHeight:'100vh'}}>
-      <nav style={{position:'sticky',top:0,zIndex:10,background:'rgba(8,8,15,0.97)',borderBottom:`0.5px solid ${BDR}`,padding:'6px 0 4px'}}>
-        <p style={{textAlign:'center',fontSize:12,fontWeight:700,color:MU,letterSpacing:'0.06em',textTransform:'uppercase',marginBottom:6}}>{appName}</p>
+      <nav style={{position:'sticky',top:0,zIndex:10,background:'rgba(6,6,18,0.85)',backdropFilter:'blur(16px)',WebkitBackdropFilter:'blur(16px)',borderBottom:`1px solid rgba(255,255,255,0.08)`,padding:'6px 0 4px'}}>
+        <p style={{textAlign:'center',fontSize:11,fontWeight:800,color:MU,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6}}>{appName}</p>
         <div style={{display:'flex',justifyContent:'space-around',maxWidth:680,margin:'0 auto'}}>
           {NAV.map(([id,ic,color])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:1,color:tab===id?color:MU,padding:'2px 10px'}}>
-              <div style={{padding:'5px 10px',borderRadius:12,background:tab===id?h(color,0.15):'transparent',transition:'all 0.15s'}}>
-                <i className={`ti ${ic}`} style={{fontSize:21,display:'block'}}/>
+            <button key={id} onClick={()=>setTab(id)} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:1,color:tab===id?color:MU,padding:'2px 8px',minWidth:58,minHeight:52}}>
+              <div style={{
+                padding:'6px 14px',borderRadius:14,
+                background:tab===id?color:'transparent',
+                boxShadow:tab===id?`0 0 16px ${color}88`:'none',
+                transition:'all 0.18s'
+              }}>
+                <i className={`ti ${ic}`} style={{fontSize:21,display:'block',color:tab===id?'#060612':MU}}/>
               </div>
-              <span style={{fontSize:10,fontWeight:tab===id?700:400,letterSpacing:'0.02em'}}>{id}</span>
+              <span style={{fontSize:10,fontWeight:tab===id?800:500,letterSpacing:'0.03em',color:tab===id?color:MU}}>{id}</span>
             </button>
           ))}
         </div>
       </nav>
-      <div style={{maxWidth:680,margin:'0 auto',padding:'1rem 1rem 4rem'}}>
+      <div style={{maxWidth:680,margin:'0 auto',padding:'1rem 1rem 5rem'}}>
         {tab==='home'&&<Dashboard foods={foods} workouts={workouts} weightLog={weightLog} goals={goals} setWeightLog={setWeightLog} ac={ac} streak={streak}/>}
-        {tab==='train'&&<TrainTab workouts={workouts} setWorkouts={setWorkouts} templates={templates} setTemplates={setTemplates} ac={ac}/>}
+        {tab==='train'&&<TrainTab workouts={workouts} setWorkouts={setWorkouts} templates={templates} setTemplates={setTemplates}/>}
         {tab==='food'&&<FoodTab foods={foods} setFoods={setFoods}/>}
         {tab==='progress'&&<ProgressTab foods={foods} workouts={workouts} weightLog={weightLog} goals={goals} ac={ac}/>}
         {tab==='settings'&&<SettingsTab goals={goals} setGoals={setGoals} ac={ac}/>}
