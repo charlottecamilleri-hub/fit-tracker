@@ -116,7 +116,30 @@ const stor={
   set:(k,v)=>{try{localStorage.setItem('fit_'+k,JSON.stringify(v));}catch{}}
 };
 const AI_URL='/.netlify/functions/estimate';
-const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
+const resizeImage=(file,maxPx=900)=>new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onerror=reject;
+  reader.onload=e=>{
+    const img=new Image();
+    img.onerror=reject;
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>h){if(w>maxPx){h=Math.round(h*maxPx/w);w=maxPx;}}
+      else{if(h>maxPx){w=Math.round(w*maxPx/h);h=maxPx;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>{
+        const r2=new FileReader();
+        r2.onload=()=>resolve(r2.result.split(',')[1]);
+        r2.onerror=reject;
+        r2.readAsDataURL(blob);
+      },'image/jpeg',0.82);
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
 const validMT=t=>['image/jpeg','image/png','image/gif','image/webp'].includes(t)?t:'image/jpeg';
 function calcStreak(foods){let s=0;for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(foods.some(f=>ds(f.ts)===d.toDateString()))s++;else break;}return s;}
 
@@ -576,8 +599,8 @@ function PhotoEst({onAdd}){
   const run=async()=>{
     if(!file)return;setLoad(true);setErr('');setRes(null);
     try{
-      const b64=await toB64(file);
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a nutrition expert. Analyse this food photo and estimate nutritional content. Return ONLY raw JSON: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}.',messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:validMT(file.type),data:b64}},{type:'text',text:'Estimate the nutritional content of this food.'}]}]})});
+      const b64=await resizeImage(file);
+      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a nutrition expert. Analyse this food photo and estimate nutritional content. Return ONLY raw JSON: {name:string,calories:number,protein:number,carbs:number,fat:number,serving:string}.',messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'Estimate the nutritional content of this food.'}]}]})});
       const d=await r.json();setRes(JSON.parse((d.content?.[0]?.text||'').replace(/```json|```/g,'').trim()));
     }catch{setErr('Could not analyse photo. Try a clearer shot.');}
     setLoad(false);
