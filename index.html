@@ -592,7 +592,7 @@ function PhotoEst({onAdd}){
             <p style={{fontSize:15,color:MU,fontWeight:600}}>tap to upload or take a photo</p>
             <p style={{fontSize:12,color:DIM,marginTop:5,fontWeight:500}}>works best with a clear shot of the plate</p>
           </div>
-          <input type="file" accept="image/*" capture="environment" onChange={handleFile} style={{display:'none'}}/>
+          <input type="file" accept="image/*" onChange={handleFile} style={{display:'none'}}/>
         </label>
       ):(
         <div>
