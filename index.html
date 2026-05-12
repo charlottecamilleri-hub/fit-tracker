@@ -358,7 +358,7 @@ function Onboarding({onComplete}){
   );
 }
 
-function FoodEntry({f,onDelete,onEdit}){
+function FoodEntry({f,onDelete,onEdit,onSave}){
   const[mode,setMode]=useState('view');
   const[v,setV]=useState({...f});
   const[confirmDel,setConfirmDel]=useState(false);
@@ -395,6 +395,7 @@ function FoodEntry({f,onDelete,onEdit}){
         <p style={{color:TX,fontWeight:700,flex:1,marginRight:8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14}}>{f.name}</p>
         <div style={{display:'flex',gap:4,flexShrink:0}}>
           <button className="icon-btn btn ghost" onClick={()=>setMode('edit')}><i className="ti ti-edit" style={{fontSize:16}}/></button>
+          {onSave&&<button className="icon-btn btn ghost" onClick={onSave} style={{color:AMBER}}><i className="ti ti-star" style={{fontSize:16}}/></button>}
           <button className="icon-btn btn dng" onClick={()=>setConfirmDel(true)}><i className="ti ti-trash" style={{fontSize:16}}/></button>
         </div>
       </div>
@@ -405,7 +406,7 @@ function FoodEntry({f,onDelete,onEdit}){
         <span style={{color:AMBER,fontWeight:700}}>{Math.round(f.fat)}g F</span>
         <span style={{color:LIME,fontWeight:700}}>{Math.round(f.fibre||0)}g Fi</span>
       </div>
-      <p style={{fontSize:12,color:DIM,marginTop:4,fontStyle:'italic',fontWeight:500}}>{f.serving}</p>
+      <p style={{fontSize:12,color:MU,marginTop:4,fontStyle:'italic',fontWeight:500}}>{f.serving}</p>
     </div>
   );
 }
@@ -889,9 +890,10 @@ function AIEst({onAdd}){
       </div>
       {err&&<p style={{fontSize:13,color:PINK,marginTop:10,fontWeight:600}}>{err}</p>}
       {res&&(<div style={{marginTop:14,background:RZ,borderRadius:16,padding:'16px'}}>
-        <p style={{fontWeight:800,fontSize:15,color:TX,marginBottom:3}}>{res.name}</p>
-        <p style={{fontSize:12,color:MU,marginBottom:12,fontStyle:'italic',fontWeight:500}}>{res.serving}</p>
-        <NG calories={res.calories} protein={res.protein} carbs={res.carbs} fat={res.fat}/>
+        <p style={{fontSize:11,color:MU,fontWeight:700,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.08em'}}>looks right? adjust before adding</p>
+        <input value={res.name} onChange={e=>setRes({...res,name:e.target.value})} style={{marginBottom:8,fontWeight:700,fontSize:15}}/>
+        <input value={res.serving} onChange={e=>setRes({...res,serving:e.target.value})} placeholder="serving" style={{marginBottom:12,fontSize:13}}/>
+        <NG calories={res.calories} protein={res.protein} carbs={res.carbs} fat={res.fat} fibre={res.fibre||0}/>
         <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
       </div>)}
     </div>
@@ -901,11 +903,11 @@ function AIEst({onAdd}){
 function PhotoEst({onAdd}){
   const[file,setFile]=useState(null);const[preview,setPreview]=useState(null);
   const[load,setLoad]=useState(false);const[res,setRes]=useState(null);const[err,setErr]=useState('');
-  const[extraQ,setExtraQ]=useState('');const[extraLoad,setExtraLoad]=useState(false);const[extras,setExtras]=useState([]);
+  const[extraQ,setExtraQ]=useState('');const[extraLoad,setExtraLoad]=useState(false);const[extras,setExtras]=useState([]);const[extraErr,setExtraErr]=useState('');
   const handleFile=e=>{const f=e.target.files[0];if(!f)return;setFile(f);setRes(null);setErr('');setExtras([]);const r=new FileReader();r.onload=()=>setPreview(r.result);r.readAsDataURL(f);};
   const reset=()=>{setFile(null);setPreview(null);setRes(null);setErr('');setExtras([]);setExtraQ('');};
   const addExtra=useCallback(async()=>{
-    if(!extraQ.trim())return;setExtraLoad(true);
+    if(!extraQ.trim())return;setExtraLoad(true);setExtraErr('');
     try{
       const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:300,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number}',messages:[{role:'user',content:extraQ}]})});
       const d=await r.json();
@@ -913,7 +915,7 @@ function PhotoEst({onAdd}){
       setExtras(e=>[...e,{...ex,q:extraQ}]);
       setRes(prev=>({...prev,calories:Math.round(prev.calories+ex.calories),protein:Math.round((prev.protein+ex.protein)*10)/10,carbs:Math.round((prev.carbs+ex.carbs)*10)/10,fat:Math.round((prev.fat+ex.fat)*10)/10,fibre:Math.round(((prev.fibre||0)+(ex.fibre||0))*10)/10}));
       setExtraQ('');
-    }catch{/* silently ignore */}
+    }catch(e){setExtraErr('Could not estimate. Check your connection.');}
     setExtraLoad(false);
   },[extraQ]);
   const run=async()=>{
@@ -938,7 +940,7 @@ function PhotoEst({onAdd}){
           <div style={{border:`2px dashed ${h(CYAN,0.4)}`,borderRadius:16,padding:'2.5rem 1rem',textAlign:'center',background:h(CYAN,0.06)}}>
             <i className="ti ti-camera" style={{fontSize:42,color:CYAN,display:'block',marginBottom:10}}/>
             <p style={{fontSize:15,color:MU,fontWeight:600}}>tap to upload or take a photo</p>
-            <p style={{fontSize:12,color:DIM,marginTop:5,fontWeight:500}}>works best with a clear shot of the plate</p>
+            <p style={{fontSize:12,color:MU,marginTop:5,fontWeight:500}}>works best with a clear shot of the plate</p>
           </div>
           <input type="file" accept="image/*" onChange={handleFile} style={{display:'none'}}/>
         </label>
@@ -960,7 +962,7 @@ function PhotoEst({onAdd}){
         <p style={{fontSize:11,color:MU,fontWeight:700,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.08em'}}>looks right? adjust anything before adding</p>
         <input value={res.name} onChange={e=>setRes({...res,name:e.target.value})} style={{marginBottom:8,fontWeight:700,fontSize:15}}/>
         <input value={res.serving} onChange={e=>setRes({...res,serving:e.target.value})} placeholder="serving description" style={{marginBottom:14,fontSize:13}}/>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:14}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6,marginBottom:14}}>
           {[['kcal','calories',PINK,ON_PINK],['P','protein',CYAN,ON_CYAN],['C','carbs',BLUE,ON_BLUE],['F','fat',AMBER,ON_AMBER],['Fi','fibre',LIME,ON_LIME]].map(([l,k,bg,tc])=>(
             <div key={k} style={{textAlign:'center',background:bg,borderRadius:12,padding:'8px 4px'}}>
               <input type="number" value={res[k]} min={0} inputMode="numeric"
@@ -978,6 +980,7 @@ function PhotoEst({onAdd}){
               {extraLoad?<i className="ti ti-loader-2" style={{fontSize:14}}/>:<i className="ti ti-plus" style={{fontSize:16}}/>}
             </button>
           </div>
+          {extraErr&&<p style={{fontSize:12,color:PINK,marginTop:8,fontWeight:600}}>{extraErr}</p>}
           {extras.length>0&&(
             <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:5}}>
               {extras.map((ex,i)=>(
@@ -1023,12 +1026,97 @@ function FoodTab({foods,setFoods,savedMeals,setSavedMeals}){
   const catColors={breakfast:AMBER,lunch:CYAN,dinner:VIOLET,snacks:LIME};
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      {canCopy&&(
-        <button className="btn" style={{border:`1px solid ${h(CYAN,0.35)}`,color:CYAN,background:h(CYAN,0.08),borderRadius:16,padding:'14px 16px',textAlign:'left',fontWeight:700,minHeight:54}} onClick={copyYesterday}>
-          <i className="ti ti-copy" style={{marginRight:8,fontSize:16,verticalAlign:-2}}/>copy yesterday's log ({yFoods.length} item{yFoods.length!==1?'s':''})
-        </button>
+      {/* save meal modal */}
+      {saveModal&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(6,6,18,0.92)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
+          <div className="card" style={{width:'100%',maxWidth:380}}>
+            <p style={{fontSize:16,fontWeight:800,color:TX,marginBottom:14}}>save as meal</p>
+            <input value={saveName} onChange={e=>setSaveName(e.target.value)} placeholder={saveModal.name} style={{marginBottom:14}}/>
+            <div style={{display:'flex',gap:10}}>
+              <button className="btn sm" style={{flex:1,background:AMBER,color:ON_AMBER,border:'none',fontWeight:800,minHeight:48}} onClick={()=>saveMeal(saveModal)}>save</button>
+              <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>setSaveModal(null)}>cancel</button>
+            </div>
+          </div>
+        </div>
       )}
-      {/* saved meals quick access */}
+      {/* 1 - logging card: always first */}
+      <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+          <span style={{fontSize:12,color:MU,fontWeight:600}}>logging as</span>
+          {/* meal category with scroll fade */}
+          <div style={{position:'relative',overflow:'hidden'}}>
+            <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:2,WebkitOverflowScrolling:'touch',scrollbarWidth:'none',msOverflowStyle:'none'}}>
+              {MEAL_CATS.map(c=>(
+                <button key={c} onClick={()=>setMealCat(c)} style={{flexShrink:0,padding:'6px 12px',fontSize:12,border:`1px solid ${mealCat===c?catColors[c]:BDR}`,background:mealCat===c?h(catColors[c],0.15):'transparent',borderRadius:100,color:mealCat===c?catColors[c]:MU,fontWeight:mealCat===c?800:500,minHeight:36,transition:'all 0.15s'}}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div style={{position:'absolute',right:0,top:0,bottom:0,width:24,background:'linear-gradient(to right,transparent,var(--sf))',pointerEvents:'none'}}/>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:0,marginBottom:14,background:RZ,borderRadius:14,padding:4}}>
+          {MODES.map(([m,ic,lb,c,tc])=>(
+            <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:'10px 4px',fontSize:13,border:'none',background:mode===m?c:'transparent',borderRadius:11,color:mode===m?tc:MU,fontWeight:mode===m?800:500,transition:'all 0.15s',minHeight:48,letterSpacing:mode===m?'0.01em':'normal'}}>
+              <i className={`ti ${ic}`} style={{marginRight:4,fontSize:14,verticalAlign:-2}}/>{lb}
+            </button>
+          ))}
+        </div>
+        {mode==='product'&&<OFFSearch onAdd={onAdd}/>}
+        {mode==='describe'&&<AIEst onAdd={onAdd}/>}
+        {mode==='photo'&&<PhotoEst onAdd={onAdd}/>}
+      </div>
+      {/* 2 - today's log */}
+      {tf.length>0&&(
+        <div className="card">
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+            <span className="lbl" style={{marginBottom:0}}>today</span>
+            <div style={{display:'flex',gap:12}}>
+              <span style={{fontSize:14,fontWeight:800,color:PINK}}>{Math.round(tot.cal)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
+              <span style={{fontSize:14,fontWeight:800,color:CYAN}}>{Math.round(tot.pro)}<span style={{color:MU,fontWeight:500,fontSize:12}}>g P</span></span>
+            </div>
+          </div>
+          {MEAL_CATS.map(cat=>{
+            const catFoods=tf.filter(f=>(f.meal||'breakfast')===cat);
+            if(!catFoods.length)return null;
+            const catCal=catFoods.reduce((s,f)=>s+f.calories,0);
+            const c=catColors[cat];
+            return(
+              <div key={cat} style={{marginBottom:14}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                  <span style={{fontSize:12,fontWeight:800,color:c,textTransform:'uppercase',letterSpacing:'0.08em'}}>{cat}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:MU}}>{Math.round(catCal)} kcal</span>
+                </div>
+                {catFoods.map(f=>(
+                  <div key={f.id}>
+                    <FoodEntry f={f} onDelete={onDelete} onEdit={onEdit} onSave={()=>{setSaveModal(f);setSaveName(f.name);}}/>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {/* 3 - recently logged */}
+      {recent.length>0&&(
+        <div className="card">
+          <span className="lbl">recently logged</span>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {recent.map((f,i)=>(
+              <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${BDR}`,paddingBottom:8}}>
+                <div style={{flex:1,minWidth:0,marginRight:10}}>
+                  <p style={{fontSize:14,fontWeight:700,color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</p>
+                  <p style={{fontSize:11,color:MU,fontWeight:500}}>{f.serving} · {Math.round(f.calories)} kcal · {Math.round(f.protein)}g P</p>
+                </div>
+                <button className="btn sm" style={{background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:40,flexShrink:0}} onClick={()=>quickAdd(f)}>
+                  <i className="ti ti-plus" style={{fontSize:14}}/>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* 4 - saved meals */}
       {savedMeals.length>0&&(
         <div>
           <button className="btn ghost sm" style={{color:AMBER,minHeight:44}} onClick={()=>setShowSaved(s=>!s)}>
@@ -1052,87 +1140,11 @@ function FoodTab({foods,setFoods,savedMeals,setSavedMeals}){
           )}
         </div>
       )}
-      {recent.length>0&&(
-        <div className="card">
-          <span className="lbl">recently logged</span>
-          <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {recent.map((f,i)=>(
-              <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${BDR}`,paddingBottom:8}}>
-                <div style={{flex:1,minWidth:0,marginRight:10}}>
-                  <p style={{fontSize:14,fontWeight:700,color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</p>
-                  <p style={{fontSize:11,color:MU,fontWeight:500}}>{f.serving} · {Math.round(f.calories)} kcal · {Math.round(f.protein)}g P</p>
-                </div>
-                <button className="btn sm" style={{background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:40,flexShrink:0}} onClick={()=>quickAdd(f)}>
-                  <i className="ti ti-plus" style={{fontSize:14}}/>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* meal category selector */}
-      <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:2}}>
-        {MEAL_CATS.map(c=>(
-          <button key={c} onClick={()=>setMealCat(c)} style={{flexShrink:0,padding:'8px 14px',fontSize:13,border:`1px solid ${mealCat===c?catColors[c]:BDR}`,background:mealCat===c?h(catColors[c],0.15):'transparent',borderRadius:100,color:mealCat===c?catColors[c]:MU,fontWeight:mealCat===c?800:500,minHeight:40,transition:'all 0.15s'}}>
-            {c}
-          </button>
-        ))}
-      </div>
-      <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
-        <div style={{display:'flex',gap:0,marginBottom:16,background:RZ,borderRadius:14,padding:4}}>
-          {MODES.map(([m,ic,lb,c,tc])=>(
-            <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:'10px 4px',fontSize:13,border:'none',background:mode===m?c:'transparent',borderRadius:11,color:mode===m?tc:MU,fontWeight:mode===m?800:500,transition:'all 0.15s',minHeight:48,letterSpacing:mode===m?'0.01em':'normal'}}>
-              <i className={`ti ${ic}`} style={{marginRight:4,fontSize:14,verticalAlign:-2}}/>{lb}
-            </button>
-          ))}
-        </div>
-        {mode==='product'&&<OFFSearch onAdd={onAdd}/>}
-        {mode==='describe'&&<AIEst onAdd={onAdd}/>}
-        {mode==='photo'&&<PhotoEst onAdd={onAdd}/>}
-      </div>
-      {/* save meal modal */}
-      {saveModal&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(6,6,18,0.92)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
-          <div className="card" style={{width:'100%',maxWidth:380}}>
-            <p style={{fontSize:16,fontWeight:800,color:TX,marginBottom:14}}>save as meal</p>
-            <input value={saveName} onChange={e=>setSaveName(e.target.value)} placeholder={saveModal.name} style={{marginBottom:14}}/>
-            <div style={{display:'flex',gap:10}}>
-              <button className="btn sm" style={{flex:1,background:AMBER,color:ON_AMBER,border:'none',fontWeight:800,minHeight:48}} onClick={()=>saveMeal(saveModal)}>save</button>
-              <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>setSaveModal(null)}>cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {tf.length>0&&(
-        <div className="card">
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-            <span className="lbl" style={{marginBottom:0}}>today</span>
-            <div style={{display:'flex',gap:12}}>
-              <span style={{fontSize:14,fontWeight:800,color:PINK}}>{Math.round(tot.cal)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
-              <span style={{fontSize:14,fontWeight:800,color:CYAN}}>{Math.round(tot.pro)}<span style={{color:MU,fontWeight:500,fontSize:12}}>g P</span></span>
-            </div>
-          </div>
-          {MEAL_CATS.map(cat=>{
-            const catFoods=tf.filter(f=>(f.meal||'breakfast')===cat);
-            if(!catFoods.length)return null;
-            const catCal=catFoods.reduce((s,f)=>s+f.calories,0);
-            const c=catColors[cat];
-            return(
-              <div key={cat} style={{marginBottom:14}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                  <span style={{fontSize:12,fontWeight:800,color:c,textTransform:'uppercase',letterSpacing:'0.08em'}}>{cat}</span>
-                  <span style={{fontSize:12,fontWeight:700,color:MU}}>{Math.round(catCal)} kcal</span>
-                </div>
-                {catFoods.map(f=>(
-                  <div key={f.id} style={{position:'relative'}}>
-                    <FoodEntry f={f} onDelete={onDelete} onEdit={onEdit}/>
-                    <button style={{position:'absolute',top:2,right:44,background:'transparent',border:'none',color:AMBER,fontSize:11,fontWeight:700,padding:'2px 4px'}} onClick={()=>{setSaveModal(f);setSaveName(f.name);}} title="Save as meal"><i className="ti ti-star" style={{fontSize:12}}/></button>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
+      {/* 5 - copy yesterday */}
+      {canCopy&&(
+        <button className="btn" style={{border:`1px solid ${h(CYAN,0.35)}`,color:CYAN,background:h(CYAN,0.08),borderRadius:16,padding:'14px 16px',textAlign:'left',fontWeight:700,minHeight:54}} onClick={copyYesterday}>
+          <i className="ti ti-copy" style={{marginRight:8,fontSize:16,verticalAlign:-2}}/>copy yesterday's log ({yFoods.length} item{yFoods.length!==1?'s':''})
+        </button>
       )}
     </div>
   );
@@ -1270,11 +1282,68 @@ function ProgressTab({foods,workouts,weightLog,goals,ac}){
   );
 }
 
+function TDEECalc({loc,setLoc,units}){
+  const isLbs=units==='lbs';
+  const[sex,setSex]=useState('female');
+  const[age,setAge]=useState(30);
+  const[heightVal,setHeightVal]=useState(isLbs?65:165); // inches or cm
+  const[weightVal,setWeightVal]=useState(isLbs?143:65); // lbs or kg
+  const[activity,setActivity]=useState(1.375);
+  const[result,setResult]=useState(null);
+  const calc=()=>{
+    const kg=isLbs?weightVal/2.20462:weightVal;
+    const cm=isLbs?heightVal*2.54:heightVal;
+    const bmr=sex==='male'?(10*kg)+(6.25*cm)-(5*age)+5:(10*kg)+(6.25*cm)-(5*age)-161;
+    const tdee=Math.round(bmr*activity);
+    setResult({tdee,cut:tdee-400,bulk:tdee+300});
+  };
+  const acts=[['sedentary (desk job)',1.2],['light (1-3x/week)',1.375],['moderate (3-5x/week)',1.55],['active (6-7x/week)',1.725],['very active (2x/day)',1.9]];
+  const hu=isLbs?'in':'cm';const wu=isLbs?'lbs':'kg';
+  const hMn=isLbs?55:140;const hMx=isLbs?84:220;
+  const wMn=isLbs?88:40;const wMx=isLbs?440:200;
+  return(
+    <div>
+      <p style={{fontSize:13,color:MU,fontWeight:500,marginBottom:14,lineHeight:1.6}}>Don't know your calorie target? Calculate it from your stats.</p>
+      <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:12,padding:3,marginBottom:14}}>
+        {[['female','F'],['male','M']].map(([v,l])=>(
+          <button key={v} onClick={()=>setSex(v)} style={{flex:1,padding:'10px',fontSize:14,border:'none',background:sex===v?PINK:'transparent',borderRadius:10,color:sex===v?ON_PINK:MU,fontWeight:sex===v?800:500,minHeight:44}}>{l}</button>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
+        {[['age','yrs',18,80,1,age,setAge,AMBER],[`height`,hu,hMn,hMx,1,heightVal,setHeightVal,CYAN],[`weight`,wu,wMn,wMx,1,weightVal,setWeightVal,LIME]].map(([lb,u,mn,mx,st,val,set,c])=>(
+          <div key={lb}>
+            <label style={{fontSize:11,color:c,fontWeight:700,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>{lb} ({u})</label>
+            <input type="number" value={val} min={mn} max={mx} step={st} inputMode="numeric" onChange={e=>set(Math.max(mn,Math.min(mx,+e.target.value)))} style={{textAlign:'center',fontWeight:700}}/>
+          </div>
+        ))}
+      </div>
+      <div style={{marginBottom:14}}>
+        <label style={{fontSize:12,color:MU,fontWeight:600,display:'block',marginBottom:7}}>activity level</label>
+        <select value={activity} onChange={e=>setActivity(+e.target.value)}>{acts.map(([l,v])=><option key={v} value={v}>{l}</option>)}</select>
+      </div>
+      <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:50,marginBottom:result?14:0}} onClick={calc}>calculate</button>
+      {result&&(
+        <>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+            {[['cut',result.cut,BLUE,ON_BLUE],['maintain',result.tdee,LIME,ON_LIME],['bulk',result.bulk,AMBER,ON_AMBER]].map(([l,v,bg,tc])=>(
+              <button key={l} onClick={()=>setLoc(lo=>({...lo,calories:v}))} style={{background:bg,borderRadius:14,padding:'12px 6px',textAlign:'center',border:'none',cursor:'pointer'}}>
+                <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
+                <div style={{fontSize:10,color:tc,fontWeight:700,opacity:0.75,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
+              </button>
+            ))}
+          </div>
+          <p style={{fontSize:11,color:MU,textAlign:'center',marginTop:8,fontWeight:500}}>tap a goal to apply it</p>
+        </>
+      )}
+    </div>
+  );
+}
+
 function SettingsTab({goals,setGoals,ac}){
   const[loc,setLoc]=useState({...goals});const[ok,setOk]=useState(false);
   useEffect(()=>setLoc({...goals}),[goals]);
   const save=()=>{setGoals({...loc});setOk(true);setTimeout(()=>setOk(false),2000);};
-  const flds=[['calories','daily calories','kcal',1000,5000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
+  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
   return(
     <div style={{display:'flex',flexDirection:'column',gap:14}}>
       <div className="card">
@@ -1318,56 +1387,7 @@ function SettingsTab({goals,setGoals,ac}){
       <div className="card">
         <span className="lbl">TDEE calculator</span>
         <p style={{fontSize:13,color:MU,fontWeight:500,marginBottom:14,lineHeight:1.6}}>Don't know your calorie target? Calculate it from your stats.</p>
-        {(()=>{
-          const[sex,setSex]=useState('female');
-          const[age,setAge]=useState(30);
-          const[heightCm,setHeightCm]=useState(165);
-          const[weightKg,setWeightKg]=useState(65);
-          const[activity,setActivity]=useState(1.375);
-          const[result,setResult]=useState(null);
-          const calc=()=>{
-            // Mifflin-St Jeor
-            const bmr=sex==='male'
-              ?(10*weightKg)+(6.25*heightCm)-(5*age)+5
-              :(10*weightKg)+(6.25*heightCm)-(5*age)-161;
-            const tdee=Math.round(bmr*activity);
-            setResult({tdee,cut:tdee-400,bulk:tdee+300});
-          };
-          const acts=[['sedentary (desk job)',1.2],['light (1-3x/week)',1.375],['moderate (3-5x/week)',1.55],['active (6-7x/week)',1.725],['very active (2x/day)',1.9]];
-          return(
-            <div>
-              <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:12,padding:3,marginBottom:14}}>
-                {[['female','F'],['male','M']].map(([v,l])=>(
-                  <button key={v} onClick={()=>setSex(v)} style={{flex:1,padding:'10px',fontSize:14,border:'none',background:sex===v?PINK:'transparent',borderRadius:10,color:sex===v?ON_PINK:MU,fontWeight:sex===v?800:500,minHeight:44}}>{l}</button>
-                ))}
-              </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
-                {[['age','yrs',18,80,1,age,setAge,AMBER],['height','cm',140,220,1,heightCm,setHeightCm,CYAN],['weight','kg',40,200,1,weightKg,setWeightKg,LIME]].map(([lb,u,mn,mx,st,val,set,c])=>(
-                  <div key={lb}>
-                    <label style={{fontSize:11,color:c,fontWeight:700,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>{lb} ({u})</label>
-                    <input type="number" value={val} min={mn} max={mx} step={st} inputMode="numeric" onChange={e=>set(Math.max(mn,Math.min(mx,+e.target.value)))} style={{textAlign:'center',fontWeight:700}}/>
-                  </div>
-                ))}
-              </div>
-              <div style={{marginBottom:14}}>
-                <label style={{fontSize:12,color:MU,fontWeight:600,display:'block',marginBottom:7}}>activity level</label>
-                <select value={activity} onChange={e=>setActivity(+e.target.value)}>{acts.map(([l,v])=><option key={v} value={v}>{l}</option>)}</select>
-              </div>
-              <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:50,marginBottom:result?14:0}} onClick={calc}>calculate</button>
-              {result&&(
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-                  {[['cut',result.cut,BLUE,ON_BLUE],['maintain',result.tdee,LIME,ON_LIME],['bulk',result.bulk,AMBER,ON_AMBER]].map(([l,v,bg,tc])=>(
-                    <button key={l} onClick={()=>setLoc(lo=>({...lo,calories:v}))} style={{background:bg,borderRadius:14,padding:'12px 6px',textAlign:'center',border:'none',cursor:'pointer'}}>
-                      <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
-                      <div style={{fontSize:10,color:tc,fontWeight:700,opacity:0.75,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {result&&<p style={{fontSize:11,color:DIM,textAlign:'center',marginTop:8,fontWeight:500}}>tap a goal to apply it</p>}
-            </div>
-          );
-        })()}
+        <TDEECalc loc={loc} setLoc={setLoc} units={goals.units||'kg'}/>
       </div>
       <div className="card">
         <span className="lbl">daily targets</span>
