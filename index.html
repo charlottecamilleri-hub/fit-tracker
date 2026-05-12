@@ -13,7 +13,6 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.1/umd/index.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.1.1/index.css"/>
 <style>
@@ -792,76 +791,12 @@ function TrainTab({workouts,setWorkouts,templates,setTemplates}){
   );
 }
 
-function BarcodeScanner({onDetected,onClose}){
-  const videoRef=React.useRef(null);
-  const readerRef=React.useRef(null);
-  const[err,setErr]=React.useState('');
-  const[status,setStatus]=React.useState('starting');
-  useEffect(()=>{
-    let stopped=false;
-    const start=async()=>{
-      try{
-        // request camera permission first
-        await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-        if(stopped)return;
-        const Lib=window.ZXing;
-        if(!Lib||!Lib.BrowserMultiFormatReader){setErr('Barcode library not loaded. Try refreshing.');return;}
-        const codeReader=new Lib.BrowserMultiFormatReader();
-        readerRef.current=codeReader;
-        setStatus('scanning');
-        const devices=await Lib.BrowserMultiFormatReader.listVideoInputDevices();
-        const backCamera=devices.find(d=>/back|rear|environment/i.test(d.label))||devices[devices.length-1];
-        codeReader.decodeFromVideoDevice(backCamera?.deviceId||undefined,videoRef.current,(result,err)=>{
-          if(stopped)return;
-          if(result){stopped=true;codeReader.reset();onDetected(result.getText());}
-        });
-      }catch(e){
-        if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'){
-          setErr('Camera permission denied. Allow camera access in your browser settings and try again.');
-        }else if(e.name==='NotFoundError'){
-          setErr('No camera found on this device.');
-        }else{
-          setErr('Could not start camera: '+(e.message||e.name||'unknown error'));
-        }
-      }
-    };
-    start();
-    return()=>{stopped=true;if(readerRef.current){try{readerRef.current.reset();}catch{}}};
-  },[]);
-  return(
-    <div style={{position:'fixed',inset:0,background:'rgba(6,6,18,0.97)',zIndex:100,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
-      <div style={{width:'100%',maxWidth:400}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-          <p style={{fontSize:16,fontWeight:800,color:TX}}>scan barcode</p>
-          <button className="btn sm ghost" style={{minHeight:40}} onClick={onClose}><i className="ti ti-x" style={{fontSize:18}}/></button>
-        </div>
-        {err?(
-          <div style={{textAlign:'center',padding:'2rem 1rem'}}>
-            <i className="ti ti-camera-off" style={{fontSize:40,color:PINK,display:'block',marginBottom:12}}/>
-            <p style={{color:PINK,fontSize:14,fontWeight:600,lineHeight:1.6}}>{err}</p>
-            <p style={{color:MU,fontSize:12,marginTop:10,fontWeight:500}}>You can still type or paste the barcode number manually.</p>
-          </div>
-        ):(
-          <div style={{position:'relative',borderRadius:16,overflow:'hidden',background:'#000',aspectRatio:'4/3'}}>
-            <video ref={videoRef} style={{width:'100%',height:'100%',objectFit:'cover'}} muted playsInline/>
-            {status==='scanning'&&(
-              <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
-                <div style={{width:'70%',aspectRatio:'3/1',border:`2px solid ${CYAN}`,borderRadius:8,boxShadow:`0 0 0 9999px rgba(6,6,18,0.55)`}}/>
-              </div>
-            )}
-          </div>
-        )}
-        {!err&&<p style={{fontSize:12,color:MU,textAlign:'center',marginTop:12,fontWeight:500}}>point the camera at a barcode</p>}
-      </div>
-    </div>
-  );
-}
-
 function OFFSearch({onAdd}){
   const[q,setQ]=useState('');const[load,setLoad]=useState(false);
   const[res,setRes]=useState([]);const[sel,setSel]=useState(null);
   const[qty,setQty]=useState(100);const[err,setErr]=useState('');
-  const[scanning,setScanning]=useState(false);
+  const[scanLoad,setScanLoad]=useState(false);
+  const scanRef=React.useRef(null);
   const isBC=s=>/^\d{6,14}$/.test(s.trim());
   const nut=(p,g)=>{const n=p.nutriments||{},f=g/100;return{calories:Math.round((n['energy-kcal_100g']||n['energy-kcal']||0)*f),protein:Math.round((n['proteins_100g']||n.proteins||0)*f*10)/10,carbs:Math.round((n['carbohydrates_100g']||n.carbohydrates||0)*f*10)/10,fat:Math.round((n['fat_100g']||n.fat||0)*f*10)/10,fibre:Math.round((n['fiber_100g']||n['fibers_100g']||0)*f*10)/10};};
   const search=useCallback(async(overrideQ)=>{
@@ -873,14 +808,36 @@ function OFFSearch({onAdd}){
     }catch{setErr('Could not reach Open Food Facts.');}
     setLoad(false);
   },[q]);
-  const onBarcode=code=>{setScanning(false);setQ(code);search(code);};
+
+  const scanBarcode=async(file)=>{
+    if(!file)return;
+    setScanLoad(true);setErr('');
+    try{
+      const b64=await resizeImage(file,1200);
+      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        model:'claude-sonnet-4-6',max_tokens:100,
+        system:'Look at this image and find any barcode (EAN, UPC, etc). Return ONLY the barcode number as plain digits, nothing else. If no barcode is visible, return the word NONE.',
+        messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'What is the barcode number in this image?'}]}]
+      })});
+      const d=await r.json();
+      const code=(d.content?.[0]?.text||'').trim().replace(/\D/g,'');
+      if(code.length>=6){setQ(code);search(code);}
+      else setErr('No barcode found in image. Try a clearer photo.');
+    }catch{setErr('Could not read barcode. Try typing it manually.');}
+    setScanLoad(false);
+  };
+
   const doAdd=()=>{if(!sel)return;const n=nut(sel,qty);onAdd({id:Date.now(),ts:Date.now(),source:'off',name:sel.product_name||'Product',serving:`${qty}g`,...n});setQ('');setRes([]);setSel(null);setQty(100);};
   return(
     <div>
-      {scanning&&<BarcodeScanner onDetected={onBarcode} onClose={()=>setScanning(false)}/>}
       <div style={{display:'flex',gap:8,marginBottom:12}}>
         <input value={q} onChange={e=>{setQ(e.target.value);setSel(null);setRes([]);}} onKeyDown={e=>e.key==='Enter'&&search()} placeholder="product name or barcode"/>
-        <button className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,flexShrink:0,minWidth:50,minHeight:50}} onClick={()=>setScanning(true)} title="Scan barcode"><i className="ti ti-scan" style={{fontSize:18}}/></button>
+        <label style={{flexShrink:0}} title="Scan barcode with camera">
+          <div className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,minWidth:50,minHeight:50,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+            {scanLoad?<i className="ti ti-loader-2" style={{fontSize:18}}/>:<i className="ti ti-scan" style={{fontSize:18}}/>}
+          </div>
+          <input ref={scanRef} type="file" accept="image/*" capture="environment" onChange={e=>scanBarcode(e.target.files[0])} style={{display:'none'}}/>
+        </label>
         <button className="btn sm" style={{background:BLUE,color:ON_BLUE,border:'none',fontWeight:800,flexShrink:0,minWidth:50,minHeight:50}} onClick={()=>search()} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:<i className="ti ti-search"/>}</button>
       </div>
       {err&&<p style={{fontSize:13,color:PINK,marginBottom:10,fontWeight:600}}>{err}</p>}
