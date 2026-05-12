@@ -27,7 +27,7 @@ body{
     radial-gradient(ellipse 40% 30% at 5% 85%, rgba(10,132,255,0.15) 0%, transparent 70%),
     radial-gradient(ellipse 35% 25% at 50% 50%, rgba(255,159,10,0.08) 0%, transparent 70%),
     #060612;
-  background-attachment:fixed;
+  background-attachment:scroll;
 }
 #root{max-width:680px;margin:0 auto}
 input,textarea,select{
@@ -51,18 +51,18 @@ button:active{opacity:0.72}
 .btn:hover{background:#1A1A35}
 .btn:disabled{opacity:0.25;cursor:not-allowed}
 .btn.sm{padding:10px 14px;font-size:13px;border-radius:11px;min-height:42px}
-.btn.ghost{background:transparent;border-color:transparent;color:#5A5A80}
+.btn.ghost{background:transparent;border-color:transparent;color:#8080B0}
 .btn.ghost:hover{color:#F0F0FF;background:rgba(255,255,255,0.06)}
 .btn.dng{color:#FF375F;border-color:rgba(255,55,95,0.25);background:rgba(255,55,95,0.06)}
 .btn.dng:hover{background:rgba(255,55,95,0.12)}
 .card{background:rgba(10,10,28,0.75);border:1px solid rgba(255,255,255,0.09);border-radius:22px;padding:1.25rem 1.4rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.neon-pink{box-shadow:0 0 24px rgba(255,55,95,0.55),0 0 48px rgba(255,55,95,0.2)}
-.neon-cyan{box-shadow:0 0 24px rgba(0,200,255,0.55),0 0 48px rgba(0,200,255,0.2)}
-.neon-violet{box-shadow:0 0 24px rgba(191,90,242,0.55),0 0 48px rgba(191,90,242,0.2)}
-.neon-blue{box-shadow:0 0 24px rgba(10,132,255,0.5),0 0 48px rgba(10,132,255,0.18)}
-.neon-amber{box-shadow:0 0 24px rgba(255,159,10,0.5),0 0 48px rgba(255,159,10,0.18)}
+.neon-pink{box-shadow:0 0 16px rgba(255,55,95,0.35),0 0 32px rgba(255,55,95,0.12)}
+.neon-cyan{box-shadow:0 0 16px rgba(0,200,255,0.35),0 0 32px rgba(0,200,255,0.12)}
+.neon-violet{box-shadow:0 0 16px rgba(191,90,242,0.35),0 0 32px rgba(191,90,242,0.12)}
+.neon-blue{box-shadow:0 0 16px rgba(10,132,255,0.3),0 0 32px rgba(10,132,255,0.1)}
+.neon-amber{box-shadow:0 0 16px rgba(255,159,10,0.3),0 0 32px rgba(255,159,10,0.1)}
 .pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:#1A1A35;color:#6A6A90;letter-spacing:0.02em}
-.lbl{font-size:10px;font-weight:700;color:#3A3A60;text-transform:uppercase;letter-spacing:0.12em;display:block;margin-bottom:12px}
+.lbl{font-size:11px;font-weight:700;color:#7878AA;text-transform:uppercase;letter-spacing:0.10em;display:block;margin-bottom:12px}
 input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1A1A35;border:none;padding:0;cursor:pointer;min-height:auto}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;cursor:pointer;border:3px solid #060612}
 input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;border:3px solid #060612;cursor:pointer}
@@ -80,7 +80,7 @@ body.light .btn.ghost{background:transparent!important;color:#5050A0!important}
 body.light .btn.dng{color:#FF375F!important;background:rgba(255,55,95,0.06)!important;border-color:rgba(255,55,95,0.2)!important}
 body.light .pill{background:#E0E0F0!important;color:#5050A0!important}
 body.light .stepper-btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
-body.light .lbl{color:#7070B0!important}
+body.light .lbl{color:#5050A0!important}
 body.light nav{background:rgba(242,242,255,0.92)!important;border-color:rgba(0,0,20,0.08)!important}
 body.light .neon-pink,body.light .neon-cyan,body.light .neon-violet,body.light .neon-blue,body.light .neon-amber{box-shadow:0 4px 16px rgba(0,0,0,0.1)!important}
 body.light input[type=range]{background:#D8D8EE!important}
@@ -292,7 +292,7 @@ function RangeBars({foods,goal,ac,range}){
         <g key={i}>
           <rect x={x} y={0} width={bw} height={H} fill={DIM} rx="5"/>
           {d.cal>0&&<rect x={x} y={H-hh} width={bw} height={hh} fill={c} rx="5" opacity={d.now?1:0.5}/>}
-          {i%labelEvery===0&&<text x={x+bw/2} y={H+15} textAnchor="middle" fill={d.now?TX:MU} fontSize="8" fontWeight={d.now?'700':'400'}>{d.lbl}</text>}
+          {i%labelEvery===0&&<text x={x+bw/2} y={H+15} textAnchor="middle" fill={d.now?TX:MU} fontSize="11" fontWeight={d.now?'700':'400'}>{d.lbl}</text>}
         </g>
       );})}
     </svg>
@@ -315,9 +315,9 @@ function WtLine({log,rollingAvg,units}){
       {/* rolling average - bold */}
       {ac2.length>1&&<polyline points={ac2.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={BLUE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>}
       {ac2.length>0&&<circle cx={ac2[ac2.length-1].x} cy={ac2[ac2.length-1].y} r={5} fill={BLUE}/>}
-      <text x="8" y={H+16} fill={MU} fontSize="10" fontWeight="600">{new Date(pts[0].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
-      <text x={W-8} y={H+16} fill={MU} fontSize="10" textAnchor="end" fontWeight="600">{new Date(pts[pts.length-1].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
-      {ac2.length>1&&<text x={W/2} y={H+16} fill={BLUE} fontSize="9" textAnchor="middle" fontWeight="600">— 7d avg</text>}
+      <text x="8" y={H+16} fill={MU} fontSize="11" fontWeight="600">{new Date(pts[0].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
+      <text x={W-8} y={H+16} fill={MU} fontSize="11" textAnchor="end" fontWeight="600">{new Date(pts[pts.length-1].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
+      {ac2.length>1&&<text x={W/2} y={H+16} fill={BLUE} fontSize="11" textAnchor="middle" fontWeight="600">— 7d avg</text>}
     </svg>
   );
 }
@@ -327,7 +327,7 @@ function ColorChip({label,value,unit,bg,tc,neon}){
     <div className={neon} style={{background:bg,borderRadius:18,padding:'14px 8px',textAlign:'center'}}>
       <div style={{fontSize:26,fontWeight:800,color:tc,lineHeight:1}}>{value}</div>
       <div style={{fontSize:10,color:tc,marginTop:4,fontWeight:700,opacity:0.75,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</div>
-      <div style={{fontSize:10,color:tc,fontWeight:600,opacity:0.55,marginTop:1}}>{unit}</div>
+      <div style={{fontSize:11,color:tc,fontWeight:600,opacity:0.7,marginTop:1}}>{unit}</div>
     </div>
   );
 }
@@ -707,9 +707,9 @@ function TrainTab({workouts,setWorkouts,templates,setTemplates}){
             <div key={i} style={{display:'flex',gap:8,alignItems:'center'}}>
               <span style={{fontSize:13,color:VIOLET,fontWeight:800,minWidth:30,flexShrink:0}}>S{i+1}</span>
               <input type="number" value={s.reps} min={1} inputMode="numeric" onChange={e=>upd(i,'reps',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
-              <span style={{fontSize:14,color:DIM,fontWeight:700,flexShrink:0}}>x</span>
+              <span style={{fontSize:14,color:MU,fontWeight:700,flexShrink:0}}>x</span>
               <input type="number" value={s.weight} min={0} step={2.5} inputMode="decimal" onChange={e=>upd(i,'weight',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
-              <span style={{fontSize:12,color:DIM,fontWeight:600,flexShrink:0}}>kg</span>
+              <span style={{fontSize:12,color:MU,fontWeight:600,flexShrink:0}}>kg</span>
               {sets.length>1&&<button className="icon-btn btn ghost" onClick={()=>rmS(i)}><i className="ti ti-minus" style={{fontSize:15}}/></button>}
             </div>
           ))}
