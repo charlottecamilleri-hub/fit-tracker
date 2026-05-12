@@ -997,12 +997,12 @@ function PhotoEst({onAdd}){
         <input value={res.name} onChange={e=>setRes({...res,name:e.target.value})} style={{marginBottom:8,fontWeight:700,fontSize:15}}/>
         <input value={res.serving} onChange={e=>setRes({...res,serving:e.target.value})} placeholder="serving description" style={{marginBottom:14,fontSize:13}}/>
         <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6,marginBottom:14}}>
-          {[['kcal','calories',PINK,ON_PINK],['P','protein',CYAN,ON_CYAN],['C','carbs',BLUE,ON_BLUE],['F','fat',AMBER,ON_AMBER],['Fi','fibre',LIME,ON_LIME]].map(([l,k,bg,tc])=>(
-            <div key={k} style={{textAlign:'center',background:bg,borderRadius:12,padding:'8px 4px'}}>
+          {[['kcal','calories',PINK],['P','protein',CYAN],['C','carbs','rgba(0,200,255,0.65)'],['F','fat',AMBER],['Fi','fibre','rgba(50,215,75,0.8)']].map(([l,k,c])=>(
+            <div key={k} style={{textAlign:'center',background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:12,padding:'8px 4px'}}>
               <input type="number" value={res[k]} min={0} inputMode="numeric"
                 onChange={e=>setRes({...res,[k]:Math.max(0,+e.target.value)})}
-                style={{background:'transparent',border:'none',borderRadius:0,textAlign:'center',fontSize:17,fontWeight:800,color:tc,padding:'0',minHeight:'auto',width:'100%',boxShadow:'none'}}/>
-              <div style={{fontSize:11,color:tc,fontWeight:700,opacity:0.75,marginTop:1}}>{l}</div>
+                style={{background:'transparent',border:'none',borderRadius:0,textAlign:'center',fontSize:17,fontWeight:800,color:c,padding:'0',minHeight:'auto',width:'100%',boxShadow:'none'}}/>
+              <div style={{fontSize:11,color:MU,fontWeight:700,marginTop:1}}>{l}</div>
             </div>
           ))}
         </div>
@@ -1363,10 +1363,10 @@ function TDEECalc({loc,setLoc,units}){
       {result&&(
         <>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-            {[['cut',result.cut,BLUE,ON_BLUE],['maintain',result.tdee,LIME,ON_LIME],['bulk',result.bulk,AMBER,ON_AMBER]].map(([l,v,bg,tc])=>(
-              <button key={l} onClick={()=>setLoc(lo=>({...lo,calories:v}))} style={{background:bg,borderRadius:14,padding:'12px 6px',textAlign:'center',border:'none',cursor:'pointer'}}>
-                <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
-                <div style={{fontSize:10,color:tc,fontWeight:700,opacity:0.75,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
+            {[['cut',result.cut,CYAN],['maintain',result.tdee,LIME],['bulk',result.bulk,AMBER]].map(([l,v,c])=>(
+              <button key={l} onClick={()=>setLoc(lo=>({...lo,calories:v}))} style={{background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:14,padding:'12px 6px',textAlign:'center',cursor:'pointer'}}>
+                <div style={{fontSize:17,fontWeight:800,color:c}}>{v}</div>
+                <div style={{fontSize:10,color:MU,fontWeight:700,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
               </button>
             ))}
           </div>
