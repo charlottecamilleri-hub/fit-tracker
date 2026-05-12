@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<title>My Tracker</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Crunched"/>
+<meta name="theme-color" content="#060612"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<title>Crunched</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -106,7 +112,7 @@ const ON_BLUE='#FFFFFF';
 const ON_AMBER='#060612';
 const ON_LIME='#060612';
 
-const DG={calories:2000,protein:140,carbs:200,fat:65,name:'',theme:'dark',appName:'My Tracker'};
+const DG={calories:2000,protein:140,carbs:200,fat:65,name:'',theme:'dark',appName:'Crunched'};
 const MG=['chest','back','shoulders','biceps','triceps','legs','glutes','core','cardio','full body'];
 const tod=()=>new Date().toDateString();
 const ds=ts=>new Date(ts).toDateString();
@@ -846,7 +852,7 @@ function App(){
 
   const ac=CYAN;
   const streak=calcStreak(foods);
-  const appName=goals.appName||'My Tracker';
+  const appName=goals.appName||'Crunched';
   const isDark=goals.theme!=='light';
 
   useEffect(()=>{
@@ -897,6 +903,13 @@ function App(){
   );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
