@@ -61,6 +61,7 @@ button:active{opacity:0.72}
 .neon-violet{box-shadow:0 0 16px rgba(191,90,242,0.35),0 0 32px rgba(191,90,242,0.12)}
 .neon-blue{box-shadow:0 0 16px rgba(10,132,255,0.3),0 0 32px rgba(10,132,255,0.1)}
 .neon-amber{box-shadow:0 0 16px rgba(255,159,10,0.3),0 0 32px rgba(255,159,10,0.1)}
+.neon-lime{box-shadow:0 0 16px rgba(50,215,75,0.35),0 0 32px rgba(50,215,75,0.12)}
 .pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:#1A1A35;color:#6A6A90;letter-spacing:0.02em}
 .lbl{font-size:11px;font-weight:700;color:#7878AA;text-transform:uppercase;letter-spacing:0.10em;display:block;margin-bottom:12px}
 input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1A1A35;border:none;padding:0;cursor:pointer;min-height:auto}
@@ -82,7 +83,7 @@ body.light .pill{background:#E0E0F0!important;color:#5050A0!important}
 body.light .stepper-btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
 body.light .lbl{color:#5050A0!important}
 body.light nav{background:rgba(242,242,255,0.92)!important;border-color:rgba(0,0,20,0.08)!important}
-body.light .neon-pink,body.light .neon-cyan,body.light .neon-violet,body.light .neon-blue,body.light .neon-amber{box-shadow:0 4px 16px rgba(0,0,0,0.1)!important}
+body.light .neon-pink,body.light .neon-cyan,body.light .neon-violet,body.light .neon-blue,body.light .neon-amber,body.light .neon-lime{box-shadow:0 4px 16px rgba(0,0,0,0.1)!important}
 body.light input[type=range]{background:#D8D8EE!important}
 </style>
 </head>
@@ -335,7 +336,7 @@ function ColorChip({label,value,unit,bg,tc,neon}){
 function Onboarding({onComplete}){
   const[name,setName]=useState('');
   const[loc,setLoc]=useState({calories:2000,protein:140,carbs:200,fat:65,fibre:30});
-  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,300,5,CYAN],['carbs','carbs','g',50,500,5,BLUE],['fat','fat','g',20,150,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
+  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
   return(
     <div style={{minHeight:'100vh',background:BG,display:'flex',flexDirection:'column',justifyContent:'center',padding:'2rem 1.25rem'}}>
       <div style={{marginBottom:'2rem'}}>
@@ -460,7 +461,7 @@ function Dashboard({foods,workouts,cardio,weightLog,goals,setWeightLog,ac,streak
       {/* color blocking stat chips */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
         <ColorChip label="net remaining" value={Math.max(0,calLeft)} unit="kcal" bg={PINK} tc={ON_PINK} neon="neon-pink"/>
-        <ColorChip label="burned" value={burned} unit="kcal" bg={LIME} tc={ON_LIME} neon="neon-cyan"/>
+        <ColorChip label="burned" value={burned} unit="kcal" bg={LIME} tc={ON_LIME} neon="neon-lime"/>
         <ColorChip label="weight" value={lw?toDisplay(lw,units):'--'} unit={unitLabel(units)} bg={CYAN} tc={ON_CYAN} neon="neon-cyan"/>
       </div>
 
@@ -570,7 +571,7 @@ function CardioLog({cardio,setCardio,weightLog}){
         <div style={{background:h(LIME,0.1),border:`1px solid ${h(LIME,0.25)}`,borderRadius:14,padding:'12px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
           <div>
             <p style={{fontSize:12,color:MU,fontWeight:600,marginBottom:2}}>estimated burn</p>
-            <p style={{fontSize:11,color:DIM,fontWeight:500}}>based on {lw}kg body weight</p>
+            <p style={{fontSize:11,color:MU,fontWeight:500}}>based on {lw}kg body weight</p>
           </div>
           <span style={{fontSize:28,fontWeight:800,color:LIME}}>{preview}<span style={{fontSize:13,color:MU,fontWeight:500}}> kcal</span></span>
         </div>
@@ -1250,7 +1251,7 @@ function ProgressTab({foods,workouts,weightLog,goals,ac}){
       <div className="card">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
           <span className="lbl" style={{marginBottom:0}}>calories · {rangeLabel}</span>
-          <span style={{fontSize:11,color:DIM,fontWeight:600}}>-- = goal</span>
+          <span style={{fontSize:11,color:MU,fontWeight:600}}>-- = goal</span>
         </div>
         <RangeBars foods={foods} goal={goals.calories} ac={ac} range={range}/>
         {avgCal!==null&&(
@@ -1553,7 +1554,7 @@ function App(){
                     <div key={l} style={{textAlign:'center',background:'rgba(6,6,18,0.5)',borderRadius:14,padding:'12px 6px'}}>
                       <div style={{fontSize:22,fontWeight:800,color:c}}>{v}</div>
                       <div style={{fontSize:10,color:MU,fontWeight:600,marginTop:2}}>{l}</div>
-                      <div style={{fontSize:10,color:DIM,fontWeight:500}}>{u}</div>
+                      <div style={{fontSize:10,color:MU,fontWeight:500}}>{u}</div>
                     </div>
                   ))}
                 </div>
