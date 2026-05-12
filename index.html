@@ -251,10 +251,10 @@ function MB({label,val,goal,color}){
 function NG({calories,protein,carbs,fat,fibre}){
   return(
     <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6,marginBottom:16}}>
-      {[['kcal',Math.round(calories),PINK,ON_PINK],['P',Math.round(protein),CYAN,ON_CYAN],['C',Math.round(carbs),BLUE,ON_BLUE],['F',Math.round(fat),AMBER,ON_AMBER],['Fi',Math.round(fibre||0),LIME,ON_LIME]].map(([l,v,bg,tc])=>(
-        <div key={l} style={{textAlign:'center',background:bg,borderRadius:12,padding:'9px 0'}}>
-          <div style={{fontSize:14,fontWeight:800,color:tc}}>{v}</div>
-          <div style={{fontSize:10,color:tc,marginTop:2,fontWeight:700,opacity:0.75}}>{l}</div>
+      {[['kcal',Math.round(calories),PINK],['P',Math.round(protein),CYAN],['C',Math.round(carbs),'rgba(0,200,255,0.65)'],['F',Math.round(fat),AMBER],['Fi',Math.round(fibre||0),'rgba(50,215,75,0.8)']].map(([l,v,c])=>(
+        <div key={l} style={{textAlign:'center',background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:12,padding:'9px 0'}}>
+          <div style={{fontSize:14,fontWeight:800,color:c}}>{v}</div>
+          <div style={{fontSize:10,color:MU,marginTop:2,fontWeight:700}}>{l}</div>
         </div>
       ))}
     </div>
@@ -323,12 +323,12 @@ function WtLine({log,rollingAvg,units}){
   );
 }
 
-function ColorChip({label,value,unit,bg,tc,neon}){
+function ColorChip({label,value,unit,color}){
   return(
-    <div className={neon} style={{background:bg,borderRadius:18,padding:'14px 8px',textAlign:'center'}}>
-      <div style={{fontSize:26,fontWeight:800,color:tc,lineHeight:1}}>{value}</div>
-      <div style={{fontSize:10,color:tc,marginTop:4,fontWeight:700,opacity:0.75,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</div>
-      <div style={{fontSize:11,color:tc,fontWeight:600,opacity:0.7,marginTop:1}}>{unit}</div>
+    <div style={{background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'14px 8px',textAlign:'center'}}>
+      <div style={{fontSize:26,fontWeight:800,color:color,lineHeight:1}}>{value}</div>
+      <div style={{fontSize:10,color:MU,marginTop:4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</div>
+      <div style={{fontSize:11,color:MU,fontWeight:600,marginTop:1}}>{unit}</div>
     </div>
   );
 }
@@ -442,7 +442,7 @@ function Dashboard({foods,workouts,cardio,weightLog,goals,setWeightLog,ac,streak
       </div>
 
       {/* calorie ring card */}
-      <div className="card" style={{textAlign:'center',paddingTop:'1.5rem',paddingBottom:'1.5rem',background:'linear-gradient(135deg,rgba(191,90,242,0.14) 0%,rgba(10,132,255,0.1) 50%,rgba(255,55,95,0.1) 100%)',border:'1px solid rgba(191,90,242,0.2)'}}>
+      <div className="card" style={{textAlign:'center',paddingTop:'1.5rem',paddingBottom:'1.5rem',background:'linear-gradient(160deg,rgba(0,200,255,0.07) 0%,transparent 60%)',border:'1px solid rgba(0,200,255,0.13)'}}>
         <Ring consumed={net} goal={goals.calories} ac={ac}/>
         {burned>0&&(
           <div style={{display:'flex',justifyContent:'center',gap:20,marginBottom:'1rem',fontSize:13}}>
@@ -453,16 +453,16 @@ function Dashboard({foods,workouts,cardio,weightLog,goals,setWeightLog,ac,streak
         )}
         <div style={{height:1,background:'rgba(255,255,255,0.08)',margin:burned>0?'0 0 1.25rem':'1.25rem 0'}}/>
         <MB label="protein" val={tot.pro} goal={goals.protein} color={CYAN}/>
-        <MB label="carbs" val={tot.carbs} goal={goals.carbs} color={BLUE}/>
-        <MB label="fat" val={tot.fat} goal={goals.fat} color={AMBER}/>
-        <MB label="fibre" val={tot.fibre} goal={goals.fibre||30} color={LIME}/>
+        <MB label="carbs" val={tot.carbs} goal={goals.carbs} color="rgba(0,200,255,0.62)"/>
+        <MB label="fat" val={tot.fat} goal={goals.fat} color="rgba(0,200,255,0.42)"/>
+        <MB label="fibre" val={tot.fibre} goal={goals.fibre||30} color="rgba(0,200,255,0.28)"/>
       </div>
 
       {/* color blocking stat chips */}
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-        <ColorChip label="net remaining" value={Math.max(0,calLeft)} unit="kcal" bg={PINK} tc={ON_PINK} neon="neon-pink"/>
-        <ColorChip label="burned" value={burned} unit="kcal" bg={LIME} tc={ON_LIME} neon="neon-lime"/>
-        <ColorChip label="weight" value={lw?toDisplay(lw,units):'--'} unit={unitLabel(units)} bg={CYAN} tc={ON_CYAN} neon="neon-cyan"/>
+        <ColorChip label="net remaining" value={Math.max(0,calLeft)} unit="kcal" color={calLeft<0?PINK:CYAN}/>
+        <ColorChip label="burned" value={burned} unit="kcal" color={LIME}/>
+        <ColorChip label="weight" value={lw?toDisplay(lw,units):'--'} unit={unitLabel(units)} color={TX}/>
       </div>
 
       {/* log weight */}
@@ -1262,8 +1262,8 @@ function ProgressTab({foods,workouts,weightLog,goals,ac}){
         )}
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-        <ColorChip label="training sessions" value={wk.length} unit={rangeLabel} bg={VIOLET} tc={ON_VIOLET} neon="neon-violet"/>
-        <ColorChip label="days logged" value={dLog} unit={rangeLabel} bg={BLUE} tc={ON_BLUE} neon="neon-blue"/>
+        <ColorChip label="training sessions" value={wk.length} unit={rangeLabel} color={CYAN}/>
+        <ColorChip label="days logged" value={dLog} unit={rangeLabel} color={CYAN}/>
       </div>
       {/* macro adherence */}
       {adherenceDays.length>0&&(
@@ -1544,13 +1544,13 @@ function App(){
             <Dashboard foods={foods} workouts={workouts} cardio={cardio} weightLog={weightLog} goals={goals} setWeightLog={setWeightLog} ac={ac} streak={streak}/>
             {/* weekly summary card */}
             {weekDaysLogged>0&&(
-              <div className="card" style={{marginTop:14,background:'linear-gradient(135deg,rgba(0,200,255,0.12) 0%,rgba(191,90,242,0.12) 100%)',border:`1px solid ${h(CYAN,0.25)}`}}>
+              <div className="card" style={{marginTop:14,border:`1px solid ${h(CYAN,0.18)}`}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
                   <span className="lbl" style={{marginBottom:0}}>this week</span>
                   {streak>0&&<span style={{fontSize:12,color:LIME,fontWeight:800}}>🔥 {streak} day streak</span>}
                 </div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-                  {[['avg calories',weekAvgCal,'kcal/day',PINK],['sessions',weekWorkouts.length,'workouts',VIOLET],['days logged',weekDaysLogged,'/ 7',CYAN]].map(([l,v,u,c])=>(
+                  {[['avg calories',weekAvgCal,'kcal/day',CYAN],['sessions',weekWorkouts.length,'workouts',CYAN],['days logged',weekDaysLogged,'/ 7',CYAN]].map(([l,v,u,c])=>(
                     <div key={l} style={{textAlign:'center',background:'rgba(6,6,18,0.5)',borderRadius:14,padding:'12px 6px'}}>
                       <div style={{fontSize:22,fontWeight:800,color:c}}>{v}</div>
                       <div style={{fontSize:10,color:MU,fontWeight:600,marginTop:2}}>{l}</div>
