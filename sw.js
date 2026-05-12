@@ -1,4 +1,4 @@
-const CACHE = 'crunched-v1';
+const CACHE = 'crunched-v2';
 const ASSETS = [
   '/',
   '/index.html',
