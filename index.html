@@ -1,1584 +1,1356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Crunched"/>
-<meta name="theme-color" content="#060612"/>
-<link rel="manifest" href="/manifest.json"/>
-<link rel="apple-touch-icon" href="/icon-192.png"/>
-<title>Crunched</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.1.1/index.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lift Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:#060612}
-body{
-  font-family:'Space Grotesk',system-ui,sans-serif;font-size:15px;color:#F0F0FF;
-  background:
-    radial-gradient(ellipse 55% 35% at 10% 10%, rgba(191,90,242,0.22) 0%, transparent 70%),
-    radial-gradient(ellipse 45% 30% at 90% 5%, rgba(0,200,255,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 75% 90%, rgba(255,55,95,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 30% at 5% 85%, rgba(10,132,255,0.15) 0%, transparent 70%),
-    radial-gradient(ellipse 35% 25% at 50% 50%, rgba(255,159,10,0.08) 0%, transparent 70%),
-    #060612;
-  background-attachment:scroll;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --surface: #181818;
+  --surface2: #222;
+  --border: #303030;
+  --accent: #c8f542;
+  --accent-dim: #9dbf2e;
+  --text: #f0f0f0;
+  --muted: #666;
+  --arms-col: #e85d75;
+  --legs-col: #f5a623;
+  --core-col: #a78bfa;
+  --back-col: #5db8f5;
+  --up: #4caf7d;
+  --down: #e85d75;
 }
-#root{max-width:680px;margin:0 auto}
-input,textarea,select{
-  font-family:'Space Grotesk',system-ui,sans-serif;
-  font-size:16px;color:#F0F0FF;background:#13132A;
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:14px;padding:12px 14px;
-  width:100%;outline:none;
-  -webkit-appearance:none;appearance:none;
-  min-height:50px;
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding-bottom: 100px; }
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+  gap: 12px;
 }
-input:focus,textarea:focus,select:focus{border-color:rgba(255,255,255,0.3);background:#1A1A35}
-select option{background:#0D0D20;color:#F0F0FF}
-textarea{resize:vertical;min-height:80px}
+
+header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.header-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.6;
+  display: none;
+}
+
+@media (min-width: 500px) { .header-date { display: block; } }
+
+/* ── REST TIMER ── */
+.rest-widget { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+
+.rest-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  min-height: 36px;
+}
+
+.rest-btn.active { background: var(--accent); border-color: var(--accent); color: #0e0e0e; }
+.rest-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.rest-display {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-align: center;
+  min-width: 52px;
+  display: none;
+}
+
+.rest-display.visible { display: block; }
+.rest-display.done { color: var(--up); }
+
+.rest-adjust { display: none; gap: 6px; align-items: center; }
+.rest-adjust.visible { display: flex; }
+
+.rest-adj-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 28px;
+}
+
+.rest-adj-btn:hover { color: var(--text); }
+.rest-duration { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+}
+
+.tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
+}
+
+.tab:hover { color: var(--text); }
+.tab.active.arms-tab { color: var(--arms-col); border-bottom-color: var(--arms-col); }
+.tab.active.legs-tab { color: var(--legs-col); border-bottom-color: var(--legs-col); }
+.tab.active.hist-tab { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+.view.active { display: block; }
+
+@media (min-width: 600px) { .view { padding: 28px 24px; } }
+
+/* ── API BANNER ── */
+.api-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.api-banner strong { color: var(--accent); display: block; margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.68rem; }
+.api-banner p { color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+.api-banner a { color: var(--accent); }
+.api-input-row { display: flex; gap: 8px; margin-top: 8px; }
+
+.api-key-input {
+  flex: 1; min-width: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 16px;
+}
+
+.api-key-input:focus { outline: none; border-color: var(--accent); }
+
+.api-save-btn {
+  background: var(--accent);
+  color: #0e0e0e;
+  border: none;
+  padding: 10px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ── DAY HEADER ── */
+.day-header { margin-bottom: 20px; }
+.day-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.1em; line-height: 1; }
+.day-title.arms-title { color: var(--arms-col); }
+.day-title.legs-title { color: var(--legs-col); }
+.day-subtitle { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+/* ── GROUP SECTION ── */
+.group-section { margin-bottom: 28px; }
+
+.group-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.group-label-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.group-label-text.back  { color: var(--back-col); }
+.group-label-text.arms  { color: var(--arms-col); }
+.group-label-text.legs  { color: var(--legs-col); }
+.group-label-text.core  { color: var(--core-col); }
+
+/* ── EXERCISE CARDS ── */
+.exercises-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .exercises-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .exercises-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.exercise-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 10px 0 0 10px;
+}
+
+.exercise-card.back-card::before  { background: var(--back-col); }
+.exercise-card.arms-card::before  { background: var(--arms-col); }
+.exercise-card.legs-card::before  { background: var(--legs-col); }
+.exercise-card.core-card::before  { background: var(--core-col); }
+.exercise-card.custom-card::before { background: var(--muted); }
+
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 8px; }
+.exercise-name { font-size: 0.95rem; font-weight: 500; line-height: 1.3; }
+.card-actions { flex-shrink: 0; }
+
+.how-to-btn, .remove-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  color: var(--muted);
+  min-height: 30px;
+}
+
+.how-to-btn:hover { color: var(--accent); border-color: var(--accent); }
+.remove-btn:hover { color: var(--arms-col); border-color: var(--arms-col); }
+
+.exercise-target {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+/* ── LAST SESSION BOX ── */
+.last-session {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  border: 1px solid var(--border);
+}
+
+.last-session-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+  font-size: 0.58rem;
+}
+
+.last-session-data { line-height: 1.6; }
+.last-session-data span { color: var(--accent); font-weight: 500; }
+.no-data { color: var(--muted); font-style: italic; }
+
+/* ── SET TABLE ── */
+.sets-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sets-table thead tr {
+  background: var(--surface2);
+}
+
+.sets-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 7px 8px;
+  text-align: center;
+  font-weight: 400;
+  border-bottom: 1px solid var(--border);
+}
+
+.sets-table th:first-child { width: 32px; }
+.sets-table th:last-child { width: 28px; }
+
+.sets-table tbody tr { border-bottom: 1px solid var(--border); }
+.sets-table tbody tr:last-child { border-bottom: none; }
+
+.sets-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+.sets-table td {
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.set-num-cell {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+/* CRITICAL: font-size 16px prevents iOS auto-zoom */
+.set-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 8px 4px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 16px;
+  width: 100%;
+  text-align: center;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.set-input::placeholder { color: #444; }
+.set-input:focus { outline: none; border-color: var(--accent); background: var(--surface2); }
+
+.overload-cell { width: 28px; }
+
+.overload-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.overload-icon.visible { opacity: 1; }
+.overload-icon.up   { color: var(--up); }
+.overload-icon.down { color: var(--down); }
+.overload-icon.same { color: var(--muted); font-size: 0.6rem; }
+
+/* ── NOTES ── */
+.exercise-notes {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  width: 100%;
+  resize: none;
+  height: 44px;
+  transition: border-color 0.15s;
+}
+
+.exercise-notes::placeholder { color: #444; }
+.exercise-notes:focus { outline: none; border-color: var(--accent); }
+
+/* ── ADD EXERCISE ── */
+.add-exercise-btn {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+  min-height: 48px;
+}
+
+.add-exercise-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── LOG BUTTON ── */
+.log-btn-wrap {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 20px 20px;
+  background: linear-gradient(to top, var(--bg) 60%, transparent);
+  display: flex;
+  justify-content: center;
+}
+
+.log-btn {
+  background: var(--accent);
+  color: #0e0e0e;
+  border: none;
+  padding: 15px 52px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+  max-width: 400px;
+}
+
+.log-btn:hover { background: var(--accent-dim); }
+.log-btn:active { transform: scale(0.98); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 90px; left: 50%; transform: translateX(-50%) translateY(10px);
+  background: var(--accent);
+  color: #0e0e0e;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 500;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 300;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 600px) {
+  .modal-overlay { align-items: center; padding: 20px; }
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 600px) {
+  .modal { border-radius: 12px; max-width: 520px; max-height: 88vh; }
+}
+
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  display: block;
+}
+
+@media (min-width: 600px) { .modal-handle { display: none; } }
+
+.modal-header {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 10;
+}
+
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.08em; line-height: 1; }
+.modal-sub { font-family: 'DM Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; color: var(--muted); }
+
+.modal-close {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.gif-container {
+  background: var(--surface2);
+  text-align: center;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gif-container img { max-width: 100%; max-height: 260px; border-radius: 6px; display: block; margin: 0 auto; }
+
+.gif-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 2;
+}
+
+.gif-status a { color: var(--accent); display: inline-block; margin-top: 4px; }
+
+.modal-body { padding: 16px 20px 24px; }
+
+.modal-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  margin-top: 16px;
+}
+
+.modal-section-label:first-child { margin-top: 0; }
+
+.cues-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+.cues-list li { display: flex; gap: 10px; font-size: 0.88rem; line-height: 1.55; }
+
+.cue-num { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--accent); min-width: 20px; padding-top: 3px; flex-shrink: 0; }
+
+.muscles-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.muscle-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.63rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  color: var(--muted);
+}
+
+.muscle-tag.primary { color: var(--accent); border-color: #3a4a20; background: #1a2010; }
+
+/* ── ADD EXERCISE MODAL ── */
+.add-modal-body { padding: 20px; }
+.add-field { margin-bottom: 16px; }
+
+.add-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.add-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+}
+
+.add-input:focus { outline: none; border-color: var(--accent); }
+.add-input-sm { width: 90px; }
+
+.add-confirm-btn {
+  width: 100%;
+  background: var(--accent);
+  color: #0e0e0e;
+  border: none;
+  padding: 14px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+/* ── HISTORY ── */
+.view-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: 0.1em; margin-bottom: 4px; }
+.view-sub { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); margin-bottom: 20px; }
+.history-empty { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); padding: 36px 0; text-align: center; }
+
+.history-session { border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+
+.history-session-header {
+  background: var(--surface);
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+}
+
+.history-session-date { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.history-session-day { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.history-session-meta { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted); text-align: right; line-height: 1.7; flex-shrink: 0; }
+.history-session-count { color: var(--accent); }
+.history-chevron { color: var(--muted); font-size: 0.65rem; margin-left: 2px; }
+
+.history-session-body { display: none; background: var(--bg); border-top: 1px solid var(--border); }
+.history-session-body.open { display: block; }
+
+.history-day-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-exercise { border-bottom: 1px solid var(--border); }
+.history-exercise:last-child { border-bottom: none; }
+.history-exercise-name { font-size: 0.88rem; font-weight: 500; color: var(--text); padding: 12px 16px 0; margin-bottom: 0; }
+
+.history-set-table { width: 100%; border-collapse: collapse; margin: 8px 0 0; }
+.history-set-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 5px 16px;
+  text-align: left;
+  font-weight: 400;
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.history-set-table td {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  padding: 9px 16px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.history-set-table tr:last-child td { border-bottom: none; }
+.history-set-table td.set-n { color: var(--muted); font-size: 0.68rem; width: 30px; }
+.history-set-table td.set-vol { text-align: right; color: var(--muted); font-size: 0.7rem; }
+.history-set-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+
+.history-note { font-size: 0.73rem; color: var(--muted); padding: 6px 16px 12px; font-style: italic; }
+
+.clear-history-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  transition: color 0.2s, border-color 0.2s;
+  min-height: 40px;
+}
+
+.clear-history-btn:hover { color: var(--arms-col); border-color: var(--arms-col); }
+
+/* Remove number input spinners */
 input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-input[type=number]{-moz-appearance:textfield}
-button{font-family:'Space Grotesk',system-ui,sans-serif;cursor:pointer;border:none;background:none;color:#F0F0FF;padding:0;font-size:14px;font-weight:600;-webkit-tap-highlight-color:transparent}
-button:active{opacity:0.72}
-.btn{border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:12px 18px;background:#13132A;color:#F0F0FF;transition:background 0.12s;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.btn:hover{background:#1A1A35}
-.btn:disabled{opacity:0.25;cursor:not-allowed}
-.btn.sm{padding:10px 14px;font-size:13px;border-radius:11px;min-height:42px}
-.btn.ghost{background:transparent;border-color:transparent;color:#8080B0}
-.btn.ghost:hover{color:#F0F0FF;background:rgba(255,255,255,0.06)}
-.btn.dng{color:#FF375F;border-color:rgba(255,55,95,0.25);background:rgba(255,55,95,0.06)}
-.btn.dng:hover{background:rgba(255,55,95,0.12)}
-.card{background:rgba(10,10,28,0.75);border:1px solid rgba(255,255,255,0.09);border-radius:22px;padding:1.25rem 1.4rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.neon-pink{box-shadow:0 0 16px rgba(255,55,95,0.35),0 0 32px rgba(255,55,95,0.12)}
-.neon-cyan{box-shadow:0 0 16px rgba(0,200,255,0.35),0 0 32px rgba(0,200,255,0.12)}
-.neon-violet{box-shadow:0 0 16px rgba(191,90,242,0.35),0 0 32px rgba(191,90,242,0.12)}
-.neon-blue{box-shadow:0 0 16px rgba(10,132,255,0.3),0 0 32px rgba(10,132,255,0.1)}
-.neon-amber{box-shadow:0 0 16px rgba(255,159,10,0.3),0 0 32px rgba(255,159,10,0.1)}
-.neon-lime{box-shadow:0 0 16px rgba(50,215,75,0.35),0 0 32px rgba(50,215,75,0.12)}
-.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:100px;background:#1A1A35;color:#6A6A90;letter-spacing:0.02em}
-.lbl{font-size:11px;font-weight:700;color:#7878AA;text-transform:uppercase;letter-spacing:0.10em;display:block;margin-bottom:12px}
-input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#1A1A35;border:none;padding:0;cursor:pointer;min-height:auto}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;cursor:pointer;border:3px solid #060612}
-input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;border:3px solid #060612;cursor:pointer}
-.stepper-btn{width:50px;height:50px;border-radius:14px;background:#13132A;border:1px solid rgba(255,255,255,0.12);color:#F0F0FF;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.icon-btn{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-:root{--tx:#F0F0FF;--mu:#6060A0;--dim:#1E1E3A;--sf:rgba(10,10,28,0.75);--rz:#13132A;--bdr:rgba(255,255,255,0.09)}
-body.light{
-  --tx:#0A0A20;--mu:#4A4A90;--dim:#D0D0E8;--sf:rgba(255,255,255,0.88);--rz:#EEEEF8;--bdr:rgba(0,0,20,0.1);
-  background:radial-gradient(ellipse 55% 35% at 10% 10%,rgba(191,90,242,0.07) 0%,transparent 70%),radial-gradient(ellipse 45% 30% at 90% 5%,rgba(0,200,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 50% 35% at 75% 90%,rgba(255,55,95,0.07) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 5% 85%,rgba(10,132,255,0.05) 0%,transparent 70%),#F2F2FF;
-}
-body.light .card{background:rgba(255,255,255,0.88)!important;border-color:rgba(0,0,20,0.08)!important}
-body.light input:not([type=range]),body.light textarea,body.light select{background:#F0F0F8!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.15)!important}
-body.light .btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
-body.light .btn.ghost{background:transparent!important;color:#5050A0!important}
-body.light .btn.dng{color:#FF375F!important;background:rgba(255,55,95,0.06)!important;border-color:rgba(255,55,95,0.2)!important}
-body.light .pill{background:#E0E0F0!important;color:#5050A0!important}
-body.light .stepper-btn{background:#EAEAF4!important;color:#0A0A20!important;border-color:rgba(0,0,20,0.12)!important}
-body.light .lbl{color:#5050A0!important}
-body.light nav{background:rgba(242,242,255,0.92)!important;border-color:rgba(0,0,20,0.08)!important}
-body.light .neon-pink,body.light .neon-cyan,body.light .neon-violet,body.light .neon-blue,body.light .neon-amber,body.light .neon-lime{box-shadow:0 4px 16px rgba(0,0,0,0.1)!important}
-body.light input[type=range]{background:#D8D8EE!important}
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const {useState,useEffect,useCallback}=React;
 
-/* ── Vibrant electric palette ── */
-const BG='#060612',SF='var(--sf)',RZ='var(--rz)';
-const BDR='var(--bdr)';
-const TX='var(--tx)',MU='var(--mu)',DIM='var(--dim)';
-
-/* Electric accent colors */
-const PINK='#FF375F';
-const CYAN='#00C8FF';
-const VIOLET='#BF5AF2';
-const BLUE='#0A84FF';
-const AMBER='#FF9F0A';
-const LIME='#32D74B';
-
-/* Text colors on colored backgrounds */
-const ON_PINK='#FFFFFF';
-const ON_CYAN='#060612';
-const ON_VIOLET='#FFFFFF';
-const ON_BLUE='#FFFFFF';
-const ON_AMBER='#060612';
-const ON_LIME='#060612';
-
-const DG={calories:2000,protein:140,carbs:200,fat:65,fibre:30,name:'',theme:'dark',appName:'Crunched',units:'kg'};
-const toDisplay=(kg,units)=>units==='lbs'?(Math.round(kg*2.20462*10)/10):kg;
-const fromDisplay=(v,units)=>units==='lbs'?(Math.round(v/2.20462*100)/100):v;
-const unitLabel=(units)=>units==='lbs'?'lbs':'kg';
-
-const ACTIVITIES=[
-  {name:'Walking (slow)',met:2.8},
-  {name:'Walking (moderate)',met:3.5},
-  {name:'Walking (brisk)',met:4.3},
-  {name:'Running (slow)',met:8.0},
-  {name:'Running (moderate)',met:10.0},
-  {name:'Running (fast)',met:13.5},
-  {name:'Cycling (light)',met:4.0},
-  {name:'Cycling (moderate)',met:8.0},
-  {name:'Cycling (vigorous)',met:12.0},
-  {name:'Swimming (light)',met:5.0},
-  {name:'Swimming (vigorous)',met:9.8},
-  {name:'HIIT',met:8.0},
-  {name:'Weight training',met:3.5},
-  {name:'Yoga',met:2.5},
-  {name:'Pilates',met:3.0},
-  {name:'Jump rope',met:12.3},
-  {name:'Rowing',met:7.0},
-  {name:'Elliptical',met:5.0},
-  {name:'Stairmaster',met:9.0},
-  {name:'Dancing',met:5.0},
-  {name:'Hiking',met:5.3},
-  {name:'Football',met:7.0},
-  {name:'Basketball',met:6.5},
-  {name:'Tennis',met:7.3},
-];
-const calcBurn=(met,mins,kg)=>Math.round(met*(kg||75)*(mins/60));
-const MG=['chest','back','shoulders','biceps','triceps','legs','glutes','core','cardio','full body'];
-const tod=()=>new Date().toDateString();
-const ds=ts=>new Date(ts).toDateString();
-const h=(c,o)=>`${c}${Math.round(o*255).toString(16).padStart(2,'0')}`;
-const stor={
-  get:k=>{try{const v=localStorage.getItem('fit_'+k);return v?JSON.parse(v):null;}catch{return null;}},
-  set:(k,v)=>{try{localStorage.setItem('fit_'+k,JSON.stringify(v));}catch{}}
-};
-const AI_URL='/.netlify/functions/estimate';
-const resizeImage=(file,maxPx=900)=>new Promise((resolve,reject)=>{
-  const reader=new FileReader();
-  reader.onerror=reject;
-  reader.onload=e=>{
-    const img=new Image();
-    img.onerror=reject;
-    img.onload=()=>{
-      let w=img.width,h=img.height;
-      if(w>h){if(w>maxPx){h=Math.round(h*maxPx/w);w=maxPx;}}
-      else{if(h>maxPx){w=Math.round(w*maxPx/h);h=maxPx;}}
-      const canvas=document.createElement('canvas');
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      canvas.toBlob(blob=>{
-        const r2=new FileReader();
-        r2.onload=()=>resolve(r2.result.split(',')[1]);
-        r2.onerror=reject;
-        r2.readAsDataURL(blob);
-      },'image/jpeg',0.82);
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-const validMT=t=>['image/jpeg','image/png','image/gif','image/webp'].includes(t)?t:'image/jpeg';
-function calcStreak(foods,workouts,cardio){
-  let s=0;
-  for(let i=0;i<365;i++){
-    const d=new Date();d.setDate(d.getDate()-i);const dt=d.toDateString();
-    const active=foods.some(f=>ds(f.ts)===dt)||workouts.some(w=>ds(w.ts)===dt)||(cardio||[]).some(c=>ds(c.ts)===dt);
-    if(active)s++;else break;
-  }
-  return s;
-}
-
-function GoalField({label,k,u,mn,mx,st,c,loc,setLoc}){
-  const clamp=v=>Math.max(mn,Math.min(mx,v));
-  return(
-    <div style={{marginBottom:24}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <label style={{fontSize:14,color:MU,fontWeight:600}}>{label}</label>
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <button className="stepper-btn" onClick={()=>setLoc(l=>({...l,[k]:clamp(l[k]-st)}))}>
-            <i className="ti ti-minus" style={{fontSize:16}}/>
-          </button>
-          <input type="number" value={loc[k]} min={mn} max={mx} step={st}
-            onChange={e=>{const v=+e.target.value;if(!isNaN(v))setLoc(l=>({...l,[k]:clamp(v)}));}}
-            style={{width:88,textAlign:'center',fontSize:18,fontWeight:800,color:c,padding:'10px 4px',minHeight:50}}/>
-          <span style={{fontSize:12,color:MU,fontWeight:600,marginLeft:-2,marginRight:2}}>{u}</span>
-          <button className="stepper-btn" onClick={()=>setLoc(l=>({...l,[k]:clamp(l[k]+st)}))}>
-            <i className="ti ti-plus" style={{fontSize:16}}/>
-          </button>
-        </div>
+<header>
+  <h1>LIFT LOG</h1>
+  <div class="header-right">
+    <div class="rest-widget">
+      <div class="rest-adjust" id="restAdjust">
+        <button class="rest-adj-btn" onclick="adjustRest(-30)">-30s</button>
+        <span class="rest-duration" id="restDuration">90s</span>
+        <button class="rest-adj-btn" onclick="adjustRest(30)">+30s</button>
       </div>
-      <input type="range" min={mn} max={mx} step={st} value={loc[k]} style={{accentColor:c,width:'100%'}} onChange={e=>setLoc(l=>({...l,[k]:+e.target.value}))}/>
+      <div class="rest-display" id="restDisplay"></div>
+      <button class="rest-btn" id="restBtn" onclick="toggleRest()">Rest Timer</button>
     </div>
-  );
-}
-
-function Ring({consumed,goal,ac}){
-  const r=68,cx=86,cy=86,circ=2*Math.PI*r;
-  const pct=Math.min(1,consumed/goal),over=consumed>goal,color=over?PINK:ac;
-  return(
-    <svg width="172" height="172" viewBox="0 0 172 172" style={{display:'block',margin:'0 auto'}}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke={DIM} strokeWidth="10"/>
-      {consumed>0&&<circle cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth="10"
-        strokeDasharray={`${pct*circ} ${circ}`} strokeLinecap="round" transform={`rotate(-90 ${cx} ${cy})`}/>}
-      <text x={cx} y={cx-14} textAnchor="middle" fill={TX} fontSize="36" fontWeight="800" fontFamily="Space Grotesk">{Math.round(consumed)}</text>
-      <text x={cx} y={cx+7} textAnchor="middle" fill={MU} fontSize="12" fontFamily="Space Grotesk" fontWeight="600">kcal eaten</text>
-      <text x={cx} y={cx+25} textAnchor="middle" fill={color} fontSize="13" fontWeight="700" fontFamily="Space Grotesk">
-        {over?`${Math.round(consumed-goal)} over`:`${Math.round(goal-consumed)} to go`}
-      </text>
-    </svg>
-  );
-}
-
-function MB({label,val,goal,color}){
-  const pct=Math.min(100,Math.round(val/goal*100));
-  return(
-    <div style={{marginBottom:16}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-        <span style={{fontSize:11,fontWeight:700,color:MU,textTransform:'uppercase',letterSpacing:'0.1em'}}>{label}</span>
-        <div>
-          <span style={{fontSize:18,fontWeight:800,color:TX}}>{Math.round(val)}</span>
-          <span style={{fontSize:12,color:MU,fontWeight:500}}>/{goal}g</span>
-        </div>
-      </div>
-      <div style={{height:8,borderRadius:4,background:DIM}}>
-        <div style={{height:'100%',borderRadius:4,background:color,width:`${pct}%`,transition:'width 0.4s'}}/>
-      </div>
+    <div class="header-date">
+      <div style="color:#c8f542" id="todayDate"></div>
+      <div>Progressive overload</div>
     </div>
-  );
-}
+  </div>
+</header>
 
-function NG({calories,protein,carbs,fat,fibre}){
-  return(
-    <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6,marginBottom:16}}>
-      {[['kcal',Math.round(calories),PINK],['P',Math.round(protein),CYAN],['C',Math.round(carbs),'rgba(0,200,255,0.65)'],['F',Math.round(fat),AMBER],['Fi',Math.round(fibre||0),'rgba(50,215,75,0.8)']].map(([l,v,c])=>(
-        <div key={l} style={{textAlign:'center',background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:12,padding:'9px 0'}}>
-          <div style={{fontSize:14,fontWeight:800,color:c}}>{v}</div>
-          <div style={{fontSize:10,color:MU,marginTop:2,fontWeight:700}}>{l}</div>
-        </div>
-      ))}
+<div class="tabs">
+  <button class="tab active arms-tab" onclick="switchTab('arms',event)">Arms</button>
+  <button class="tab legs-tab" onclick="switchTab('legs',event)">Legs + Core</button>
+  <button class="tab hist-tab" onclick="switchTab('hist',event)">History</button>
+</div>
+
+<!-- ARMS VIEW -->
+<div id="arms-view" class="view active">
+  <div class="day-header">
+    <div class="day-title arms-title">Arms</div>
+    <div class="day-subtitle">Back / Biceps / Triceps</div>
+  </div>
+
+  <div class="api-banner" id="apiBanner">
+    <strong>One-time setup: GIF API key</strong>
+    <p>Get a free key at <a href="https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb" target="_blank">rapidapi.com/exercisedb</a> (no card needed). Note: GIFs only work on the live site, not when opening the file directly from your computer.</p>
+    <div class="api-input-row">
+      <input class="api-key-input" id="apiKeyInput" type="text" placeholder="Paste RapidAPI key...">
+      <button class="api-save-btn" onclick="saveApiKey()">Save</button>
     </div>
-  );
-}
+  </div>
 
-function RangeBars({foods,goal,ac,range}){
-  const days=Array.from({length:range},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(range-1-i));return d;});
-  const grouped=range===7?days.map(d=>({
-    lbl:d.toLocaleDateString('en',{weekday:'narrow'}),
-    cal:foods.filter(f=>ds(f.ts)===d.toDateString()).reduce((s,f)=>s+f.calories,0),
-    now:d.toDateString()===tod()
-  })):(()=>{
-    const weeks=[];
-    for(let i=0;i<days.length;i+=7){
-      const chunk=days.slice(i,i+7);
-      const cal=chunk.reduce((s,d)=>s+foods.filter(f=>ds(f.ts)===d.toDateString()).reduce((ss,f)=>ss+f.calories,0),0);
-      const lbl=chunk[0].toLocaleDateString('en',{day:'numeric',month:'short'});
-      weeks.push({lbl,cal,now:chunk.some(d=>d.toDateString()===tod())});
-    }
-    return weeks;
-  })();
-  const goalLine=range===7?goal:goal*7;
-  const mx=Math.max(goalLine*1.3,...grouped.map(d=>d.cal),1);
-  const H=100,n=grouped.length;
-  const W=320;
-  const bw=Math.max(6,Math.floor((W-8-(n-1)*3)/n));
-  const gap=3;
-  const totalW=(bw+gap)*n-gap+8;
-  // only show label every nth to prevent overlap
-  const labelEvery=range===7?1:range===30?2:3;
-  return(
-    <svg viewBox={`0 0 ${totalW} ${H+22}`} width="100%">
-      <line x1="0" y1={H-(goalLine/mx)*H} x2={totalW} y2={H-(goalLine/mx)*H} stroke={ac} strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4"/>
-      {grouped.map((d,i)=>{const x=i*(bw+gap)+4,hh=Math.round((d.cal/mx)*H),over=d.cal>goalLine,c=over?PINK:ac;return(
-        <g key={i}>
-          <rect x={x} y={0} width={bw} height={H} fill={DIM} rx="5"/>
-          {d.cal>0&&<rect x={x} y={H-hh} width={bw} height={hh} fill={c} rx="5" opacity={d.now?1:0.5}/>}
-          {i%labelEvery===0&&<text x={x+bw/2} y={H+15} textAnchor="middle" fill={d.now?TX:MU} fontSize="11" fontWeight={d.now?'700':'400'}>{d.lbl}</text>}
-        </g>
-      );})}
-    </svg>
-  );
-}
+  <div class="group-section">
+    <div class="group-label"><span class="group-label-text back">Back</span></div>
+    <div class="exercises-grid" id="back-grid"></div>
+  </div>
+  <div class="group-section">
+    <div class="group-label"><span class="group-label-text arms">Biceps</span></div>
+    <div class="exercises-grid" id="biceps-grid"></div>
+  </div>
+  <div class="group-section">
+    <div class="group-label"><span class="group-label-text arms">Triceps</span></div>
+    <div class="exercises-grid" id="triceps-grid"></div>
+  </div>
+  <div id="arms-custom-grid" class="exercises-grid" style="margin-bottom:10px;display:none;"></div>
+  <button class="add-exercise-btn" onclick="openAddModal('arms')">+ Add exercise to Arms</button>
+</div>
 
-function WtLine({log,rollingAvg,units}){
-  const ul=unitLabel(units||'kg');
-  if(log.length<2)return<p style={{color:MU,fontSize:13,textAlign:'center',padding:'1.5rem 0',fontStyle:'italic'}}>log 2+ entries to see your trend</p>;
-  const pts=[...log].sort((a,b)=>a.ts-b.ts).slice(-14);
-  const ws=pts.map(e=>toDisplay(e.weight,units||'kg')),mn=Math.min(...ws)-0.5,mx=Math.max(...ws)+0.5,W=272,H=80;
-  const c=pts.map((e,i)=>({x:(i/(pts.length-1))*(W-16)+8,y:H-((toDisplay(e.weight,units||'kg')-mn)/(mx-mn))*(H-12)-6}));
-  const avgPts=(rollingAvg||[]).slice(-14).filter(e=>pts.some(p=>p.ts===e.ts));
-  const ac2=avgPts.map((e,i)=>({x:i/(Math.max(1,avgPts.length-1))*(W-16)+8,y:H-((toDisplay(e.weight,units||'kg')-mn)/(mx-mn))*(H-12)-6}));
-  return(
-    <svg viewBox={`0 0 ${W} ${H+20}`} width="100%">
-      {/* raw data - faint */}
-      <polyline points={c.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={BLUE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.35"/>
-      {c.map((p,i)=><circle key={i} cx={p.x} cy={p.y} r={2} fill={BLUE} opacity={0.3}/>)}
-      {/* rolling average - bold */}
-      {ac2.length>1&&<polyline points={ac2.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={BLUE} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>}
-      {ac2.length>0&&<circle cx={ac2[ac2.length-1].x} cy={ac2[ac2.length-1].y} r={5} fill={BLUE}/>}
-      <text x="8" y={H+16} fill={MU} fontSize="11" fontWeight="600">{new Date(pts[0].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
-      <text x={W-8} y={H+16} fill={MU} fontSize="11" textAnchor="end" fontWeight="600">{new Date(pts[pts.length-1].ts).toLocaleDateString('en',{day:'numeric',month:'short'})}</text>
-      {ac2.length>1&&<text x={W/2} y={H+16} fill={BLUE} fontSize="11" textAnchor="middle" fontWeight="600">— 7d avg</text>}
-    </svg>
-  );
-}
+<!-- LEGS + CORE VIEW -->
+<div id="legs-view" class="view">
+  <div class="day-header">
+    <div class="day-title legs-title">Legs + Core</div>
+    <div class="day-subtitle">Glutes / Hamstrings / Core</div>
+  </div>
+  <div class="group-section">
+    <div class="group-label"><span class="group-label-text legs">Glutes + Hamstrings</span></div>
+    <div class="exercises-grid" id="glutes-grid"></div>
+  </div>
+  <div class="group-section">
+    <div class="group-label"><span class="group-label-text core">Core</span></div>
+    <div class="exercises-grid" id="core-grid"></div>
+  </div>
+  <div id="legs-custom-grid" class="exercises-grid" style="margin-bottom:10px;display:none;"></div>
+  <button class="add-exercise-btn" onclick="openAddModal('legs')">+ Add exercise to Legs + Core</button>
+</div>
 
-function ColorChip({label,value,unit,color}){
-  return(
-    <div style={{background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:18,padding:'14px 8px',textAlign:'center'}}>
-      <div style={{fontSize:26,fontWeight:800,color:color,lineHeight:1}}>{value}</div>
-      <div style={{fontSize:10,color:MU,marginTop:4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</div>
-      <div style={{fontSize:11,color:MU,fontWeight:600,marginTop:1}}>{unit}</div>
+<!-- HISTORY VIEW -->
+<div id="hist-view" class="view">
+  <div class="view-title">History</div>
+  <div class="view-sub">All logged sessions.</div>
+  <button class="clear-history-btn" onclick="clearHistory()">Clear all history</button>
+  <div id="history-list"></div>
+</div>
+
+<div class="log-btn-wrap" id="logBtnWrap">
+  <button class="log-btn" onclick="logSession()">LOG SESSION</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- HOW-TO MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="howToModal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
     </div>
-  );
-}
-
-function Onboarding({onComplete}){
-  const[name,setName]=useState('');
-  const[loc,setLoc]=useState({calories:2000,protein:140,carbs:200,fat:65,fibre:30});
-  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
-  return(
-    <div style={{minHeight:'100vh',background:BG,display:'flex',flexDirection:'column',justifyContent:'center',padding:'2rem 1.25rem'}}>
-      <div style={{marginBottom:'2rem'}}>
-        <p style={{fontSize:30,fontWeight:800,color:TX,marginBottom:8}}>welcome 👋</p>
-        <p style={{fontSize:15,color:MU,fontWeight:500}}>let's get you set up.</p>
-      </div>
-      <div className="card" style={{marginBottom:14}}>
-        <span className="lbl">your name</span>
-        <input value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&onComplete(name.trim(),loc)} autoComplete="given-name" style={{fontSize:18,fontWeight:700}}/>
-      </div>
-      <div className="card" style={{marginBottom:14}}>
-        <span className="lbl">daily targets</span>
-        {flds.map(([k,lb,u,mn,mx,st,c])=><GoalField key={k} label={lb} k={k} u={u} mn={mn} mx={mx} st={st} c={c} loc={loc} setLoc={setLoc}/>)}
-      </div>
-      <button onClick={()=>onComplete(name.trim(),loc)} disabled={!name.trim()}
-        style={{width:'100%',minHeight:58,borderRadius:18,border:'none',background:CYAN,color:ON_CYAN,fontSize:17,fontWeight:800,opacity:name.trim()?1:0.25,letterSpacing:'0.02em'}}>
-        get started <i className="ti ti-arrow-right" style={{marginLeft:4,verticalAlign:-2}}/>
-      </button>
+    <div class="gif-container" id="gifContainer"></div>
+    <div class="modal-body">
+      <div class="modal-section-label">Form cues</div>
+      <ul class="cues-list" id="modalCues"></ul>
+      <div class="modal-section-label">Muscles</div>
+      <div class="muscles-list" id="modalMuscles"></div>
     </div>
-  );
-}
+  </div>
+</div>
 
-function FoodEntry({f,onDelete,onEdit,onSave}){
-  const[mode,setMode]=useState('view');
-  const[v,setV]=useState({...f});
-  const[confirmDel,setConfirmDel]=useState(false);
-  if(confirmDel)return(
-    <div style={{background:h(PINK,0.1),borderRadius:14,padding:'14px',marginBottom:12,border:`1px solid ${h(PINK,0.25)}`}}>
-      <p style={{fontSize:14,color:TX,fontWeight:600,marginBottom:12}}>Delete <span style={{color:PINK}}>{f.name.length>35?f.name.slice(0,35)+'...':f.name}</span>?</p>
-      <div style={{display:'flex',gap:10}}>
-        <button className="btn sm dng" style={{flex:1,fontWeight:800}} onClick={()=>onDelete(f.id)}>yes, delete</button>
-        <button className="btn sm ghost" style={{flex:1}} onClick={()=>setConfirmDel(false)}>cancel</button>
+<!-- ADD EXERCISE MODAL -->
+<div class="modal-overlay" id="addModalOverlay" onclick="closeAddModalOnOverlay(event)">
+  <div class="modal" style="border-radius:16px 16px 0 0">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Exercise</div>
+        <div class="modal-sub" id="addModalSub"></div>
       </div>
+      <button class="modal-close" onclick="closeAddModal()">&#x2715;</button>
     </div>
-  );
-  if(mode==='edit')return(
-    <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:16,marginBottom:16}}>
-      <input value={v.name} onChange={e=>setV({...v,name:e.target.value})} style={{marginBottom:10}}/>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-        {[['calories','kcal',PINK],['protein','g',CYAN],['carbs','g',BLUE],['fat','g',AMBER],['fibre','g',LIME]].map(([k,u,c])=>(
-          <div key={k}>
-            <label style={{fontSize:12,color:c,fontWeight:700,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.06em'}}>{k} ({u})</label>
-            <input type="number" value={v[k]} min={0} onChange={e=>setV({...v,[k]:+e.target.value})}/>
-          </div>
-        ))}
+    <div class="add-modal-body">
+      <div class="add-field">
+        <label class="add-label" for="addName">Exercise name</label>
+        <input class="add-input" id="addName" type="text" placeholder="e.g. Lateral Raise" autocomplete="off">
       </div>
-      <input value={v.serving} onChange={e=>setV({...v,serving:e.target.value})} placeholder="serving description" style={{marginBottom:10}}/>
-      <div style={{display:'flex',gap:10}}>
-        <button className="btn sm" style={{flex:1,background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:48}} onClick={()=>{onEdit(v);setMode('view');}}>save</button>
-        <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>{setV({...f});setMode('view');}}>cancel</button>
+      <div class="add-field">
+        <label class="add-label" for="addSets">Number of sets</label>
+        <input class="add-input add-input-sm" id="addSets" type="number" min="1" max="10" value="3">
       </div>
+      <div class="add-field">
+        <label class="add-label" for="addTarget">Target (label)</label>
+        <input class="add-input" id="addTarget" type="text" placeholder="e.g. 3 sets x 10-12 reps" autocomplete="off">
+      </div>
+      <button class="add-confirm-btn" onclick="confirmAddExercise()">Add Exercise</button>
     </div>
-  );
-  return(
-    <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:12,marginBottom:12}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
-        <p style={{color:TX,fontWeight:700,flex:1,marginRight:8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:14}}>{f.name}</p>
-        <div style={{display:'flex',gap:4,flexShrink:0}}>
-          <button className="icon-btn btn ghost" onClick={()=>setMode('edit')}><i className="ti ti-edit" style={{fontSize:16}}/></button>
-          {onSave&&<button className="icon-btn btn ghost" onClick={onSave} style={{color:AMBER}}><i className="ti ti-star" style={{fontSize:16}}/></button>}
-          <button className="icon-btn btn dng" onClick={()=>setConfirmDel(true)}><i className="ti ti-trash" style={{fontSize:16}}/></button>
-        </div>
-      </div>
-      <div style={{display:'flex',gap:10,fontSize:13,flexWrap:'wrap'}}>
-        <span style={{color:PINK,fontWeight:800}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:500}}> kcal</span></span>
-        <span style={{color:CYAN,fontWeight:700}}>{Math.round(f.protein)}g P</span>
-        <span style={{color:BLUE,fontWeight:700}}>{Math.round(f.carbs)}g C</span>
-        <span style={{color:AMBER,fontWeight:700}}>{Math.round(f.fat)}g F</span>
-        <span style={{color:LIME,fontWeight:700}}>{Math.round(f.fibre||0)}g Fi</span>
-      </div>
-      <p style={{fontSize:12,color:MU,marginTop:4,fontStyle:'italic',fontWeight:500}}>{f.serving}</p>
-    </div>
-  );
-}
+  </div>
+</div>
 
-function Dashboard({foods,workouts,cardio,weightLog,goals,setWeightLog,ac,streak}){
-  const[wi,setWi]=useState('');
-  const units=goals.units||'kg';
-  const tf=foods.filter(f=>ds(f.ts)===tod());
-  const tot=tf.reduce((a,f)=>({cal:a.cal+f.calories,pro:a.pro+f.protein,carbs:a.carbs+f.carbs,fat:a.fat+f.fat,fibre:a.fibre+(f.fibre||0)}),{cal:0,pro:0,carbs:0,fat:0,fibre:0});
-  const tw=workouts.filter(w=>ds(w.ts)===tod());
-  const tc=cardio.filter(c=>ds(c.ts)===tod());
-  const lw=[...weightLog].sort((a,b)=>b.ts-a.ts)[0]?.weight;
-  const logW=()=>{
-    const v=parseFloat(wi);if(!v)return;
-    const kg=fromDisplay(v,units);
-    if(kg<20||kg>300)return;
-    setWeightLog(l=>[...l,{id:Date.now(),ts:Date.now(),weight:kg}]);setWi('');
-  };
-  const burned=tc.reduce((a,c)=>a+c.burned,0);
-  const net=Math.round(tot.cal)-burned;
-  const calLeft=goals.calories-net;
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'2px 2px'}}>
-        <p style={{fontSize:20,fontWeight:800,color:TX}}>hey, {goals.name}</p>
-        {streak>0&&(
-          <div style={{display:'flex',alignItems:'center',gap:6,background:h(ac,0.15),padding:'7px 14px',borderRadius:100,border:`1px solid ${h(ac,0.3)}`}}>
-            <i className="ti ti-flame" style={{fontSize:15,color:ac}}/>
-            <span style={{fontSize:13,fontWeight:800,color:ac}}>{streak} day{streak!==1?'s':''}</span>
-          </div>
-        )}
-      </div>
-
-      {/* calorie ring card */}
-      <div className="card" style={{textAlign:'center',paddingTop:'1.5rem',paddingBottom:'1.5rem',background:'linear-gradient(160deg,rgba(0,200,255,0.07) 0%,transparent 60%)',border:'1px solid rgba(0,200,255,0.13)'}}>
-        <Ring consumed={net} goal={goals.calories} ac={ac}/>
-        {burned>0&&(
-          <div style={{display:'flex',justifyContent:'center',gap:20,marginBottom:'1rem',fontSize:13}}>
-            <span style={{color:MU}}>eaten <span style={{color:PINK,fontWeight:800}}>{Math.round(tot.cal)}</span></span>
-            <span style={{color:MU}}>burned <span style={{color:LIME,fontWeight:800}}>{burned}</span></span>
-            <span style={{color:MU}}>net <span style={{color:TX,fontWeight:800}}>{net}</span></span>
-          </div>
-        )}
-        <div style={{height:1,background:'rgba(255,255,255,0.08)',margin:burned>0?'0 0 1.25rem':'1.25rem 0'}}/>
-        <MB label="protein" val={tot.pro} goal={goals.protein} color={CYAN}/>
-        <MB label="carbs" val={tot.carbs} goal={goals.carbs} color="rgba(0,200,255,0.62)"/>
-        <MB label="fat" val={tot.fat} goal={goals.fat} color="rgba(0,200,255,0.42)"/>
-        <MB label="fibre" val={tot.fibre} goal={goals.fibre||30} color="rgba(0,200,255,0.28)"/>
-      </div>
-
-      {/* color blocking stat chips */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-        <ColorChip label="net remaining" value={Math.max(0,calLeft)} unit="kcal" color={calLeft<0?PINK:CYAN}/>
-        <ColorChip label="burned" value={burned} unit="kcal" color={LIME}/>
-        <ColorChip label="weight" value={lw?toDisplay(lw,units):'--'} unit={unitLabel(units)} color={TX}/>
-      </div>
-
-      {/* log weight */}
-      <div className="card">
-        <span className="lbl">log weight</span>
-        <div style={{display:'flex',gap:8,alignItems:'center'}}>
-          <input type="number" value={wi} onChange={e=>setWi(e.target.value)} onKeyDown={e=>e.key==='Enter'&&logW()} step="0.1" inputMode="decimal" placeholder={units==='lbs'?'e.g. 160':'e.g. 72.5'} style={{flex:1}}/>
-          <span style={{color:MU,fontSize:14,whiteSpace:'nowrap',fontWeight:600}}>{unitLabel(units)}</span>
-          <button className="btn sm" style={{background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:50,padding:'10px 18px'}} onClick={logW} disabled={!wi}>log</button>
-        </div>
-      </div>
-
-      {tf.length>0&&(
-        <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
-          <span className="lbl">food today</span>
-          {tf.slice(-5).map(f=>(
-            <div key={f.id} style={{display:'flex',justifyContent:'space-between',fontSize:14,paddingBottom:10,marginBottom:10,borderBottom:`1px solid ${BDR}`}}>
-              <span style={{color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,marginRight:8,fontWeight:700}}>{f.name}</span>
-              <span style={{color:PINK,fontWeight:800,whiteSpace:'nowrap'}}>{Math.round(f.calories)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
-            </div>
-          ))}
-          {tf.length>5&&<p style={{fontSize:12,color:MU,textAlign:'center',fontWeight:600}}>+{tf.length-5} more</p>}
-        </div>
-      )}
-
-      {tw.length>0&&(
-        <div className="card" style={{borderLeft:`4px solid ${VIOLET}`}}>
-          <span className="lbl">training today</span>
-          {tw.map(w=>(
-            <div key={w.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:14,marginBottom:10}}>
-              <span style={{color:TX,fontWeight:700}}>{w.exercise}</span>
-              <div style={{display:'flex',gap:6}}>
-                <span className="pill" style={{background:h(VIOLET,0.2),color:VIOLET}}>{w.muscle}</span>
-                <span className="pill">{w.sets.length}s</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const toDateVal=ts=>new Date(ts).toISOString().slice(0,10);
-const fromDateVal=s=>{const d=new Date(s);d.setHours(12,0,0,0);return d.getTime();};
-const isToday=ts=>ds(ts)===tod();
-
-function DatePicker({logDate,setLogDate}){
-  const isT=isToday(logDate);
-  const fmt=ts=>new Date(ts).toLocaleDateString('en',{weekday:'short',day:'numeric',month:'short'});
-  return(
-    <div style={{display:'flex',alignItems:'center',gap:8,background:'var(--rz)',borderRadius:12,padding:'8px 12px',marginBottom:14}}>
-      <i className="ti ti-calendar" style={{fontSize:16,color:MU,flexShrink:0}}/>
-      <span style={{flex:1,fontSize:14,fontWeight:isT?600:800,color:isT?MU:AMBER}}>
-        {isT?'today':fmt(logDate)}
-      </span>
-      <input type="date" value={toDateVal(logDate)}
-        max={toDateVal(Date.now())}
-        onChange={e=>e.target.value&&setLogDate(fromDateVal(e.target.value))}
-        style={{opacity:0,position:'absolute',width:1,height:1}}
-        id="log-date-input"/>
-      <label htmlFor="log-date-input" style={{cursor:'pointer',display:'flex',alignItems:'center',gap:6}}>
-        <span style={{fontSize:12,color:isT?MU:AMBER,fontWeight:600}}>{isT?'change date':'change'}</span>
-      </label>
-      {!isT&&(
-        <button onClick={()=>setLogDate(Date.now())} style={{background:'transparent',border:'none',color:MU,fontSize:12,fontWeight:600,padding:'2px 6px',cursor:'pointer'}}>back to today</button>
-      )}
-    </div>
-  );
-}
-
-function CardioLog({cardio,setCardio,weightLog}){
-  const[act,setAct]=useState(ACTIVITIES[3].name);
-  const[mins,setMins]=useState(30);
-  const[confirmDel,setConfirmDel]=useState(null);
-  const[logDate,setLogDate]=useState(Date.now());
-  const lw=[...weightLog].sort((a,b)=>b.ts-a.ts)[0]?.weight||75;
-  const met=ACTIVITIES.find(a=>a.name===act)?.met||5;
-  const preview=calcBurn(met,mins,lw);
-  const logTs=new Date(logDate);logTs.setHours(12,0,0,0);
-  const save=()=>{
-    setCardio(c=>[...c,{id:Date.now(),ts:logTs.getTime(),activity:act,mins,burned:preview,weight:lw}]);
-    setMins(30);
-  };
-  const tc=cardio.filter(c=>ds(c.ts)===ds(logDate));
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      <div className="card" style={{borderLeft:`4px solid ${LIME}`}}>
-        <DatePicker logDate={logDate} setLogDate={setLogDate}/>
-        <span className="lbl">log cardio</span>
-        <div style={{marginBottom:12}}>
-          <label style={{fontSize:13,color:MU,fontWeight:600,display:'block',marginBottom:7}}>activity</label>
-          <select value={act} onChange={e=>setAct(e.target.value)}>
-            {ACTIVITIES.map(a=><option key={a.name}>{a.name}</option>)}
-          </select>
-        </div>
-        <div style={{marginBottom:14}}>
-          <label style={{fontSize:13,color:MU,fontWeight:600,display:'block',marginBottom:7}}>duration</label>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <button className="stepper-btn" onClick={()=>setMins(m=>Math.max(5,m-5))}><i className="ti ti-minus" style={{fontSize:16}}/></button>
-            <input type="number" value={mins} min={5} step={5} inputMode="numeric" onChange={e=>setMins(Math.max(5,+e.target.value))} style={{flex:1,textAlign:'center',fontSize:18,fontWeight:700}}/>
-            <span style={{fontSize:14,color:MU,fontWeight:600,flexShrink:0}}>min</span>
-            <button className="stepper-btn" onClick={()=>setMins(m=>m+5)}><i className="ti ti-plus" style={{fontSize:16}}/></button>
-          </div>
-        </div>
-        <div style={{background:h(LIME,0.1),border:`1px solid ${h(LIME,0.25)}`,borderRadius:14,padding:'12px 16px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <div>
-            <p style={{fontSize:12,color:MU,fontWeight:600,marginBottom:2}}>estimated burn</p>
-            <p style={{fontSize:11,color:MU,fontWeight:500}}>based on {lw}kg body weight</p>
-          </div>
-          <span style={{fontSize:28,fontWeight:800,color:LIME}}>{preview}<span style={{fontSize:13,color:MU,fontWeight:500}}> kcal</span></span>
-        </div>
-        <button className="btn" style={{width:'100%',background:LIME,color:ON_LIME,border:'none',fontWeight:800,minHeight:52}} onClick={save}>log activity</button>
-      </div>
-      {tc.length>0&&(
-        <div className="card">
-          <span className="lbl">cardio today</span>
-          {tc.map(c=>(
-            <div key={c.id}>
-              {confirmDel===c.id?(
-                <div style={{background:h(PINK,0.1),borderRadius:12,padding:'12px',marginBottom:10,border:`1px solid ${h(PINK,0.2)}`}}>
-                  <p style={{fontSize:13,color:TX,fontWeight:600,marginBottom:10}}>Delete <span style={{color:PINK}}>{c.activity}</span>?</p>
-                  <div style={{display:'flex',gap:8}}>
-                    <button className="btn sm dng" style={{flex:1,fontWeight:800}} onClick={()=>{setCardio(cs=>cs.filter(x=>x.id!==c.id));setConfirmDel(null);}}>yes, delete</button>
-                    <button className="btn sm ghost" style={{flex:1}} onClick={()=>setConfirmDel(null)}>cancel</button>
-                  </div>
-                </div>
-              ):(
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${BDR}`,paddingBottom:10,marginBottom:10}}>
-                  <div>
-                    <p style={{fontSize:14,color:TX,fontWeight:700}}>{c.activity}</p>
-                    <p style={{fontSize:12,color:MU,fontWeight:500}}>{c.mins} min</p>
-                  </div>
-                  <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                    <span style={{fontSize:16,fontWeight:800,color:LIME}}>{c.burned}<span style={{fontSize:12,color:MU,fontWeight:500}}> kcal</span></span>
-                    <button className="icon-btn btn dng" onClick={()=>setConfirmDel(c.id)}><i className="ti ti-trash" style={{fontSize:15}}/></button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-          <div style={{borderTop:`1px solid ${BDR}`,paddingTop:10,display:'flex',justifyContent:'space-between'}}>
-            <span style={{fontSize:13,color:MU,fontWeight:600}}>total burned today</span>
-            <span style={{fontSize:15,fontWeight:800,color:LIME}}>{tc.reduce((a,c)=>a+c.burned,0)} kcal</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Rest Timer component ── */
-function RestTimer({onClose}){
-  const PRESETS=[60,90,120,180];
-  const[dur,setDur]=useState(90);
-  const[remaining,setRemaining]=useState(null);
-  const[running,setRunning]=useState(false);
-  const intRef=React.useRef(null);
-  const start=d=>{setDur(d);setRemaining(d);setRunning(true);};
-  const stop=()=>{setRunning(false);setRemaining(null);clearInterval(intRef.current);};
-  useEffect(()=>{
-    if(running){
-      intRef.current=setInterval(()=>{
-        setRemaining(r=>{if(r<=1){clearInterval(intRef.current);setRunning(false);return 0;}return r-1;});
-      },1000);
-    }
-    return()=>clearInterval(intRef.current);
-  },[running]);
-  const pct=remaining!=null?(remaining/dur)*100:100;
-  const mm=Math.floor((remaining??dur)/60);
-  const ss=String((remaining??dur)%60).padStart(2,'0');
-  const r=54,circ=2*Math.PI*r;
-  return(
-    <div className="card" style={{borderLeft:`4px solid ${LIME}`,marginBottom:0}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-        <span className="lbl" style={{marginBottom:0}}>rest timer</span>
-        <button className="btn ghost sm" style={{minHeight:36}} onClick={onClose}><i className="ti ti-x" style={{fontSize:14}}/></button>
-      </div>
-      <div style={{display:'flex',alignItems:'center',gap:16}}>
-        <svg width="120" height="120" viewBox="0 0 120 120" style={{flexShrink:0}}>
-          <circle cx="60" cy="60" r={r} fill="none" stroke={DIM} strokeWidth="8"/>
-          <circle cx="60" cy="60" r={r} fill="none" stroke={remaining===0?PINK:LIME} strokeWidth="8"
-            strokeDasharray={`${(pct/100)*circ} ${circ}`} strokeLinecap="round" transform="rotate(-90 60 60)"/>
-          <text x="60" y="65" textAnchor="middle" fill={remaining===0?PINK:TX} fontSize="24" fontWeight="800" fontFamily="Space Grotesk">{mm}:{ss}</text>
-        </svg>
-        <div style={{flex:1}}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:10}}>
-            {PRESETS.map(p=>(
-              <button key={p} className="btn sm" style={{background:dur===p&&running?LIME:'transparent',color:dur===p&&running?ON_LIME:MU,borderColor:dur===p?LIME:BDR,fontWeight:700,minHeight:40}} onClick={()=>start(p)}>
-                {p<60?`${p}s`:`${p/60}m${p%60?p%60+'s':''}`}
-              </button>
-            ))}
-          </div>
-          {running?<button className="btn sm" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:44}} onClick={stop}>stop</button>
-          :<button className="btn sm" style={{width:'100%',background:LIME,color:ON_LIME,border:'none',fontWeight:800,minHeight:44}} onClick={()=>start(dur)}>start {dur}s</button>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TrainTab({workouts,setWorkouts,templates,setTemplates}){
-  const[ex,setEx]=useState('');const[ms,setMs]=useState('chest');
-  const[sets,setSets]=useState([{reps:10,weight:60}]);
-  const[notes,setNotes]=useState('');const[showT,setShowT]=useState(false);
-  const[tName,setTName]=useState('');const[savT,setSavT]=useState(false);
-  const[delConfirm,setDelConfirm]=useState(null);
-  const[showTimer,setShowTimer]=useState(false);
-  const[showHistory,setShowHistory]=useState(false);
-  const[logDate,setLogDate]=useState(Date.now());
-  const logDateStr=ds(logDate);
-  const tw=workouts.filter(w=>ds(w.ts)===logDateStr);
-
-  /* progressive overload - find last session for this exercise, not on the selected date */
-  const lastSession=ex.trim()?(()=>{
-    const prev=workouts.filter(w=>w.exercise.toLowerCase()===ex.trim().toLowerCase()&&ds(w.ts)!==logDateStr);
-    if(!prev.length)return null;
-    return prev.sort((a,b)=>b.ts-a.ts)[0];
-  })():null;
-
-  const addS=()=>setSets(s=>[...s,{...s[s.length-1]}]);
-  const upd=(i,f,v)=>setSets(s=>s.map((x,j)=>j===i?{...x,[f]:v}:x));
-  const rmS=i=>setSets(s=>s.filter((_,j)=>j!==i));
-  const logTs=new Date(logDate);logTs.setHours(12,0,0,0);
-  const save=()=>{
-    if(!ex.trim())return;
-    setWorkouts(w=>[...w,{id:Date.now(),ts:logTs.getTime(),exercise:ex.trim(),muscle:ms,sets:[...sets],notes}]);
-    setEx('');setSets([{reps:10,weight:60}]);setNotes('');
-    setShowTimer(true);
-  };
-  const saveTpl=()=>{if(!tName.trim()||!ex.trim())return;setTemplates(t=>[...t,{id:Date.now(),name:tName.trim(),exercise:ex,muscle:ms,sets:[...sets]}]);setTName('');setSavT(false);};
-  const loadT=t=>{setEx(t.exercise);setMs(t.muscle);setSets([...t.sets]);setShowT(false);};
-
-  const pastDates=[...new Set(workouts.filter(w=>ds(w.ts)!==logDateStr).map(w=>ds(w.ts)))].sort((a,b)=>new Date(b)-new Date(a)).slice(0,14);
-
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      {showTimer&&<RestTimer onClose={()=>setShowTimer(false)}/>}
-      <DatePicker logDate={logDate} setLogDate={setLogDate}/>
-      {templates.length>0&&(
-        <div>
-          <button className="btn ghost sm" style={{color:VIOLET,minHeight:44}} onClick={()=>setShowT(s=>!s)}>
-            <i className="ti ti-template" style={{fontSize:15,verticalAlign:-2}}/>{showT?'hide templates':'load template'}
-          </button>
-          {showT&&(
-            <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
-              {templates.map(t=>(
-                <div key={t.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:SF,border:`1px solid ${BDR}`,borderRadius:16,padding:'12px 14px',borderLeft:`4px solid ${VIOLET}`}}>
-                  <div><span style={{fontSize:14,color:TX,fontWeight:700}}>{t.name}</span><span style={{fontSize:12,color:MU,marginLeft:8,fontWeight:500}}>{t.exercise} &middot; {t.sets.length}s</span></div>
-                  <div style={{display:'flex',gap:8}}>
-                    <button className="btn sm" style={{minHeight:42}} onClick={()=>loadT(t)}>load</button>
-                    <button className="btn sm dng" style={{minHeight:42}} onClick={()=>setTemplates(ts=>ts.filter(x=>x.id!==t.id))}><i className="ti ti-x" style={{fontSize:14}}/></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      <div className="card" style={{borderLeft:`4px solid ${VIOLET}`}}>
-        <span className="lbl">log exercise</span>
-        <div style={{display:'flex',gap:8,marginBottom:8}}>
-          <input placeholder="Exercise name" value={ex} onChange={e=>setEx(e.target.value)} style={{flex:1}}/>
-          <select value={ms} onChange={e=>setMs(e.target.value)} style={{width:'auto',minWidth:110}}>{MG.map(m=><option key={m}>{m}</option>)}</select>
-        </div>
-        {/* progressive overload hint */}
-        {lastSession&&(
-          <div style={{background:h(VIOLET,0.1),border:`1px solid ${h(VIOLET,0.25)}`,borderRadius:10,padding:'8px 12px',marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:12,color:MU,fontWeight:600}}>last time</span>
-            <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'flex-end'}}>
-              {lastSession.sets.map((s,i)=><span key={i} style={{fontSize:12,fontWeight:800,color:VIOLET}}>{s.reps}×{s.weight}kg</span>)}
-            </div>
-          </div>
-        )}
-        <div style={{display:'flex',flexDirection:'column',gap:10,marginBottom:12}}>
-          {sets.map((s,i)=>(
-            <div key={i} style={{display:'flex',gap:8,alignItems:'center'}}>
-              <span style={{fontSize:13,color:VIOLET,fontWeight:800,minWidth:30,flexShrink:0}}>S{i+1}</span>
-              <input type="number" value={s.reps} min={1} inputMode="numeric" onChange={e=>upd(i,'reps',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
-              <span style={{fontSize:14,color:MU,fontWeight:700,flexShrink:0}}>x</span>
-              <input type="number" value={s.weight} min={0} step={2.5} inputMode="decimal" onChange={e=>upd(i,'weight',+e.target.value)} style={{flex:1,textAlign:'center'}}/>
-              <span style={{fontSize:12,color:MU,fontWeight:600,flexShrink:0}}>kg</span>
-              {sets.length>1&&<button className="icon-btn btn ghost" onClick={()=>rmS(i)}><i className="ti ti-minus" style={{fontSize:15}}/></button>}
-            </div>
-          ))}
-        </div>
-        <button className="btn ghost sm" style={{marginBottom:12,color:VIOLET,minHeight:44}} onClick={addS}>
-          <i className="ti ti-plus" style={{fontSize:14,verticalAlign:-2}}/>add set
-        </button>
-        <input placeholder="Notes (optional)" value={notes} onChange={e=>setNotes(e.target.value)} style={{marginBottom:12}}/>
-        <div style={{display:'flex',gap:8}}>
-          <button className="btn" style={{flex:1,background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800}} onClick={save} disabled={!ex.trim()}>save exercise</button>
-          <button className="btn sm" style={{minHeight:50,padding:'10px 14px',color:LIME,borderColor:h(LIME,0.3)}} onClick={()=>setShowTimer(t=>!t)} title="Rest timer"><i className="ti ti-clock" style={{fontSize:18,verticalAlign:-2}}/></button>
-          <button className="btn sm" style={{minHeight:50,padding:'10px 14px'}} onClick={()=>setSavT(s=>!s)} title="Save as template"><i className="ti ti-bookmark" style={{fontSize:18,verticalAlign:-2}}/></button>
-        </div>
-        {savT&&(<div style={{marginTop:12,display:'flex',gap:8}}>
-          <input placeholder="Template name" value={tName} onChange={e=>setTName(e.target.value)} style={{flex:1}}/>
-          <button className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,minHeight:50}} onClick={saveTpl} disabled={!tName.trim()}>save</button>
-        </div>)}
-      </div>
-      {tw.length>0&&(
-        <div className="card">
-          <span className="lbl">today</span>
-          {tw.map(w=>(
-            <div key={w.id}>
-              {delConfirm===w.id?(
-                <div style={{background:h(PINK,0.1),borderRadius:14,padding:'14px',marginBottom:12,border:`1px solid ${h(PINK,0.25)}`}}>
-                  <p style={{fontSize:14,color:TX,fontWeight:600,marginBottom:12}}>Delete <span style={{color:PINK}}>{w.exercise}</span>?</p>
-                  <div style={{display:'flex',gap:10}}>
-                    <button className="btn sm dng" style={{flex:1,fontWeight:800,minHeight:48}} onClick={()=>{setWorkouts(ws=>ws.filter(x=>x.id!==w.id));setDelConfirm(null);}}>yes, delete</button>
-                    <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>setDelConfirm(null)}>cancel</button>
-                  </div>
-                </div>
-              ):(
-                <div style={{borderBottom:`1px solid ${BDR}`,paddingBottom:12,marginBottom:12}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                    <span style={{fontWeight:800,fontSize:15,color:TX}}>{w.exercise}</span>
-                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
-                      <span className="pill" style={{background:h(VIOLET,0.2),color:VIOLET}}>{w.muscle}</span>
-                      <button className="icon-btn btn dng" onClick={()=>setDelConfirm(w.id)}><i className="ti ti-trash" style={{fontSize:16}}/></button>
-                    </div>
-                  </div>
-                  <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>{w.sets.map((s,i)=><span key={i} className="pill" style={{fontWeight:700}}>{s.reps}x{s.weight}kg</span>)}</div>
-                  {w.notes&&<p style={{fontSize:12,color:MU,marginTop:6,fontStyle:'italic'}}>{w.notes}</p>}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-      {/* session history */}
-      {pastDates.length>0&&(
-        <div>
-          <button className="btn ghost sm" style={{color:BLUE,minHeight:44}} onClick={()=>setShowHistory(h=>!h)}>
-            <i className="ti ti-history" style={{fontSize:15,verticalAlign:-2}}/>{showHistory?'hide history':'session history'}
-          </button>
-          {showHistory&&(
-            <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:10}}>
-              {pastDates.map(date=>{
-                const dayW=workouts.filter(w=>ds(w.ts)===date);
-                return(
-                  <div key={date} className="card" style={{borderLeft:`3px solid ${BLUE}`}}>
-                    <p style={{fontSize:12,color:BLUE,fontWeight:700,marginBottom:10}}>{new Date(date).toLocaleDateString('en',{weekday:'long',day:'numeric',month:'short'})}</p>
-                    {dayW.map(w=>(
-                      <div key={w.id} style={{borderBottom:`1px solid ${BDR}`,paddingBottom:8,marginBottom:8}}>
-                        <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-                          <span style={{fontSize:14,fontWeight:700,color:TX}}>{w.exercise}</span>
-                          <span className="pill" style={{background:h(VIOLET,0.15),color:VIOLET}}>{w.muscle}</span>
-                        </div>
-                        <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>{w.sets.map((s,i)=><span key={i} className="pill" style={{fontSize:11}}>{s.reps}×{s.weight}kg</span>)}</div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function OFFSearch({onAdd}){
-  const[q,setQ]=useState('');const[load,setLoad]=useState(false);
-  const[res,setRes]=useState([]);const[sel,setSel]=useState(null);
-  const[qty,setQty]=useState(100);const[err,setErr]=useState('');
-  const[scanLoad,setScanLoad]=useState(false);
-  const scanRef=React.useRef(null);
-  const isBC=s=>/^\d{6,14}$/.test(s.trim());
-  const nut=(p,g)=>{const n=p.nutriments||{},f=g/100;return{calories:Math.round((n['energy-kcal_100g']||n['energy-kcal']||0)*f),protein:Math.round((n['proteins_100g']||n.proteins||0)*f*10)/10,carbs:Math.round((n['carbohydrates_100g']||n.carbohydrates||0)*f*10)/10,fat:Math.round((n['fat_100g']||n.fat||0)*f*10)/10,fibre:Math.round((n['fiber_100g']||n['fibers_100g']||0)*f*10)/10};};
-  const search=useCallback(async(overrideQ)=>{
-    const qry=(overrideQ||q).trim();
-    if(!qry)return;setLoad(true);setErr('');setRes([]);setSel(null);
-    try{
-      if(isBC(qry)){const r=await fetch(`https://world.openfoodfacts.org/api/v0/product/${qry}.json`);const d=await r.json();if(d.status===1&&d.product)setRes([d.product]);else setErr('Barcode not found.');}
-      else{const r=await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(qry)}&json=1&page_size=8&action=process`);const d=await r.json();const v=(d.products||[]).filter(p=>p.nutriments&&p.product_name).slice(0,6);v.length?setRes(v):setErr('Nothing found. Try a barcode.');}
-    }catch{setErr('Could not reach Open Food Facts.');}
-    setLoad(false);
-  },[q]);
-
-  const scanBarcode=async(file)=>{
-    if(!file)return;
-    setScanLoad(true);setErr('');
-    try{
-      const b64=await resizeImage(file,1200);
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:100,
-        system:'Look at this image and find any barcode (EAN, UPC, etc). Return ONLY the barcode number as plain digits, nothing else. If no barcode is visible, return the word NONE.',
-        messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'What is the barcode number in this image?'}]}]
-      })});
-      const d=await r.json();
-      const code=(d.content?.[0]?.text||'').trim().replace(/\D/g,'');
-      if(code.length>=6){setQ(code);search(code);}
-      else setErr('No barcode found in image. Try a clearer photo.');
-    }catch{setErr('Could not read barcode. Try typing it manually.');}
-    setScanLoad(false);
-  };
-
-  const doAdd=()=>{if(!sel)return;const n=nut(sel,qty);onAdd({id:Date.now(),ts:Date.now(),source:'off',name:sel.product_name||'Product',serving:`${qty}g`,...n});setQ('');setRes([]);setSel(null);setQty(100);};
-  return(
-    <div>
-      <div style={{display:'flex',gap:8,marginBottom:12}}>
-        <input value={q} onChange={e=>{setQ(e.target.value);setSel(null);setRes([]);}} onKeyDown={e=>e.key==='Enter'&&search()} placeholder="product name or barcode"/>
-        <label style={{flexShrink:0}} title="Scan barcode with camera">
-          <div className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,minWidth:50,minHeight:50,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
-            {scanLoad?<i className="ti ti-loader-2" style={{fontSize:18}}/>:<i className="ti ti-scan" style={{fontSize:18}}/>}
-          </div>
-          <input ref={scanRef} type="file" accept="image/*" capture="environment" onChange={e=>scanBarcode(e.target.files[0])} style={{display:'none'}}/>
-        </label>
-        <button className="btn sm" style={{background:BLUE,color:ON_BLUE,border:'none',fontWeight:800,flexShrink:0,minWidth:50,minHeight:50}} onClick={()=>search()} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:<i className="ti ti-search"/>}</button>
-      </div>
-      {err&&<p style={{fontSize:13,color:PINK,marginBottom:10,fontWeight:600}}>{err}</p>}
-      {!sel&&res.length>0&&(<div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12}}>
-        {res.map((p,i)=>{const n=nut(p,100);return(
-          <button key={i} className="btn" style={{textAlign:'left',padding:'12px 14px',minHeight:58}} onClick={()=>setSel(p)}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',width:'100%'}}>
-              <div style={{flex:1,minWidth:0}}><p style={{fontSize:14,color:TX,fontWeight:700,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.product_name}</p>{p.brands&&<p style={{fontSize:12,color:MU,marginTop:2,fontWeight:500}}>{p.brands}</p>}</div>
-              <div style={{display:'flex',gap:6,marginLeft:10,flexShrink:0}}>
-                <span style={{background:PINK,color:ON_PINK,borderRadius:100,padding:'3px 10px',fontSize:11,fontWeight:800}}>{n.calories}kcal</span>
-              </div>
-            </div>
-          </button>
-        );})}
-      </div>)}
-      {sel&&(<div style={{background:RZ,borderRadius:16,padding:'16px'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
-          <div><p style={{fontWeight:800,fontSize:15,color:TX}}>{sel.product_name}</p>{sel.brands&&<p style={{fontSize:12,color:MU,marginTop:2,fontWeight:500}}>{sel.brands}</p>}</div>
-          <button className="btn ghost sm" style={{minHeight:44,flexShrink:0}} onClick={()=>setSel(null)}>change</button>
-        </div>
-        <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:14}}>
-          <label style={{fontSize:14,color:MU,whiteSpace:'nowrap',fontWeight:600}}>serving</label>
-          <input type="number" value={qty} min={1} step={5} inputMode="numeric" onChange={e=>setQty(+e.target.value)} style={{flex:1,textAlign:'center'}}/>
-          <span style={{fontSize:14,color:MU,fontWeight:600,flexShrink:0}}>g</span>
-        </div>
-        <NG {...nut(sel,qty)}/>
-        <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
-      </div>)}
-    </div>
-  );
-}
-
-function AIEst({onAdd}){
-  const[q,setQ]=useState('');const[load,setLoad]=useState(false);const[res,setRes]=useState(null);const[err,setErr]=useState('');
-  const run=useCallback(async()=>{
-    if(!q.trim())return;setLoad(true);setErr('');setRes(null);
-    try{
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number,fibre:number,serving:string}',messages:[{role:'user',content:q}]})});
-      const d=await r.json();setRes(JSON.parse((d.content?.[0]?.text||'').replace(/```json|```/g,'').trim()));
-    }catch{setErr('Could not estimate. Try being more specific.');}
-    setLoad(false);
-  },[q]);
-  const doAdd=()=>{if(!res)return;onAdd({id:Date.now(),ts:Date.now(),source:'ai',...res});setQ('');setRes(null);};
-  return(
-    <div>
-      <div style={{display:'flex',gap:8,marginBottom:res?12:0}}>
-        <textarea rows={3} value={q} onChange={e=>setQ(e.target.value)} placeholder="e.g. 180g grilled salmon, 300g sweet potato, drizzle of olive oil"/>
-        <button className="btn sm" style={{background:PINK,color:ON_PINK,border:'none',fontWeight:800,alignSelf:'flex-start',flexShrink:0,minHeight:50,padding:'12px 16px'}} onClick={run} disabled={load||!q.trim()}>{load?<i className="ti ti-loader-2"/>:'go'}</button>
-      </div>
-      {err&&<p style={{fontSize:13,color:PINK,marginTop:10,fontWeight:600}}>{err}</p>}
-      {res&&(<div style={{marginTop:14,background:RZ,borderRadius:16,padding:'16px'}}>
-        <p style={{fontSize:11,color:MU,fontWeight:700,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.08em'}}>looks right? adjust before adding</p>
-        <input value={res.name} onChange={e=>setRes({...res,name:e.target.value})} style={{marginBottom:8,fontWeight:700,fontSize:15}}/>
-        <input value={res.serving} onChange={e=>setRes({...res,serving:e.target.value})} placeholder="serving" style={{marginBottom:12,fontSize:13}}/>
-        <NG calories={res.calories} protein={res.protein} carbs={res.carbs} fat={res.fat} fibre={res.fibre||0}/>
-        <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
-      </div>)}
-    </div>
-  );
-}
-
-function PhotoEst({onAdd}){
-  const[file,setFile]=useState(null);const[preview,setPreview]=useState(null);
-  const[load,setLoad]=useState(false);const[res,setRes]=useState(null);const[err,setErr]=useState('');
-  const[extraQ,setExtraQ]=useState('');const[extraLoad,setExtraLoad]=useState(false);const[extras,setExtras]=useState([]);const[extraErr,setExtraErr]=useState('');
-  const handleFile=e=>{const f=e.target.files[0];if(!f)return;setFile(f);setRes(null);setErr('');setExtras([]);const r=new FileReader();r.onload=()=>setPreview(r.result);r.readAsDataURL(f);};
-  const reset=()=>{setFile(null);setPreview(null);setRes(null);setErr('');setExtras([]);setExtraQ('');};
-  const addExtra=useCallback(async()=>{
-    if(!extraQ.trim())return;setExtraLoad(true);setExtraErr('');
-    try{
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:300,system:'You are a nutrition expert. Return ONLY raw JSON, no markdown: {name:string,calories:number,protein:number,carbs:number,fat:number}',messages:[{role:'user',content:extraQ}]})});
-      const d=await r.json();
-      const ex=JSON.parse((d.content?.[0]?.text||'').replace(/```json|```/g,'').trim());
-      setExtras(e=>[...e,{...ex,q:extraQ}]);
-      setRes(prev=>({...prev,calories:Math.round(prev.calories+ex.calories),protein:Math.round((prev.protein+ex.protein)*10)/10,carbs:Math.round((prev.carbs+ex.carbs)*10)/10,fat:Math.round((prev.fat+ex.fat)*10)/10,fibre:Math.round(((prev.fibre||0)+(ex.fibre||0))*10)/10}));
-      setExtraQ('');
-    }catch(e){setExtraErr('Could not estimate. Check your connection.');}
-    setExtraLoad(false);
-  },[extraQ]);
-  const run=async()=>{
-    if(!file)return;setLoad(true);setErr('');setRes(null);
-    try{
-      let b64;
-      try{b64=await resizeImage(file);}
-      catch(e){setErr('Image processing failed: '+(e.message||'unknown'));setLoad(false);return;}
-      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,system:'You are a nutrition expert. Analyse this food photo and estimate nutritional content. Return ONLY raw JSON: {name:string,calories:number,protein:number,carbs:number,fat:number,fibre:number,serving:string}.',messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'Estimate the nutritional content of this food.'}]}]})});
-      const d=await r.json();
-      if(d.error){setErr('API error: '+(d.error.message||d.error.type||JSON.stringify(d.error)));setLoad(false);return;}
-      if(!d.content?.[0]?.text){setErr('Unexpected response: '+JSON.stringify(d).slice(0,120));setLoad(false);return;}
-      setRes(JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim()));
-    }catch(e){setErr('Failed: '+(e.message||'unknown error'));}
-    setLoad(false);
-  };
-  const doAdd=()=>{if(!res)return;onAdd({id:Date.now(),ts:Date.now(),source:'photo',...res});reset();};
-  return(
-    <div>
-      {!preview?(
-        <label style={{display:'block',cursor:'pointer'}}>
-          <div style={{border:`2px dashed ${h(CYAN,0.4)}`,borderRadius:16,padding:'2.5rem 1rem',textAlign:'center',background:h(CYAN,0.06)}}>
-            <i className="ti ti-camera" style={{fontSize:42,color:CYAN,display:'block',marginBottom:10}}/>
-            <p style={{fontSize:15,color:MU,fontWeight:600}}>tap to upload or take a photo</p>
-            <p style={{fontSize:12,color:MU,marginTop:5,fontWeight:500}}>works best with a clear shot of the plate</p>
-          </div>
-          <input type="file" accept="image/*" onChange={handleFile} style={{display:'none'}}/>
-        </label>
-      ):(
-        <div>
-          <div style={{position:'relative',marginBottom:12}}>
-            <img src={preview} alt="food" style={{width:'100%',borderRadius:16,maxHeight:240,objectFit:'cover',display:'block'}}/>
-            <button onClick={reset} style={{position:'absolute',top:10,right:10,background:'rgba(6,6,18,0.88)',border:'none',color:TX,borderRadius:12,padding:'8px 14px',fontSize:13,fontWeight:700,minHeight:40}}>
-              <i className="ti ti-refresh" style={{marginRight:5,fontSize:13,verticalAlign:-1}}/>retake
-            </button>
-          </div>
-          {!res&&(<button className="btn" style={{width:'100%',background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:52}} onClick={run} disabled={load}>
-            {load?<><i className="ti ti-loader-2" style={{marginRight:6}}/>analysing...</>:<><i className="ti ti-sparkles" style={{marginRight:6,fontSize:15,verticalAlign:-2}}/>analyse photo</>}
-          </button>)}
-        </div>
-      )}
-      {err&&<p style={{fontSize:13,color:PINK,marginTop:12,fontWeight:600}}>{err}</p>}
-      {res&&(<div style={{marginTop:14,background:RZ,borderRadius:16,padding:'16px'}}>
-        <p style={{fontSize:11,color:MU,fontWeight:700,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.08em'}}>looks right? adjust anything before adding</p>
-        <input value={res.name} onChange={e=>setRes({...res,name:e.target.value})} style={{marginBottom:8,fontWeight:700,fontSize:15}}/>
-        <input value={res.serving} onChange={e=>setRes({...res,serving:e.target.value})} placeholder="serving description" style={{marginBottom:14,fontSize:13}}/>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6,marginBottom:14}}>
-          {[['kcal','calories',PINK],['P','protein',CYAN],['C','carbs','rgba(0,200,255,0.65)'],['F','fat',AMBER],['Fi','fibre','rgba(50,215,75,0.8)']].map(([l,k,c])=>(
-            <div key={k} style={{textAlign:'center',background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:12,padding:'8px 4px'}}>
-              <input type="number" value={res[k]} min={0} inputMode="numeric"
-                onChange={e=>setRes({...res,[k]:Math.max(0,+e.target.value)})}
-                style={{background:'transparent',border:'none',borderRadius:0,textAlign:'center',fontSize:17,fontWeight:800,color:c,padding:'0',minHeight:'auto',width:'100%',boxShadow:'none'}}/>
-              <div style={{fontSize:11,color:MU,fontWeight:700,marginTop:1}}>{l}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{borderTop:`1px solid ${BDR}`,paddingTop:12,marginBottom:14}}>
-          <p style={{fontSize:11,color:MU,fontWeight:700,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.07em'}}>anything missing?</p>
-          <div style={{display:'flex',gap:8}}>
-            <input value={extraQ} onChange={e=>setExtraQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addExtra()} placeholder="e.g. tbsp olive oil, yoghurt dressing" style={{flex:1}}/>
-            <button className="btn sm" style={{background:VIOLET,color:ON_VIOLET,border:'none',fontWeight:800,minHeight:48,flexShrink:0,padding:'10px 16px'}} onClick={addExtra} disabled={extraLoad||!extraQ.trim()}>
-              {extraLoad?<i className="ti ti-loader-2" style={{fontSize:14}}/>:<i className="ti ti-plus" style={{fontSize:16}}/>}
-            </button>
-          </div>
-          {extraErr&&<p style={{fontSize:12,color:PINK,marginTop:8,fontWeight:600}}>{extraErr}</p>}
-          {extras.length>0&&(
-            <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:5}}>
-              {extras.map((ex,i)=>(
-                <div key={i} style={{display:'flex',justifyContent:'space-between',fontSize:12}}>
-                  <span style={{color:MU,fontWeight:600}}>+ {ex.name||ex.q}</span>
-                  <span style={{color:PINK,fontWeight:800}}>{ex.calories} kcal</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div style={{display:'flex',gap:10}}>
-          <button className="btn" style={{flex:1,background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:52}} onClick={doAdd}>add to log</button>
-          <button className="btn sm ghost" style={{minHeight:52,padding:'10px 16px'}} onClick={reset}>retake</button>
-        </div>
-      </div>)}
-    </div>
-  );
-}
-
-const MEAL_CATS=['breakfast','lunch','dinner','snacks'];
-
-function FoodTab({foods,setFoods,savedMeals,setSavedMeals}){
-  const[mode,setMode]=useState('product');
-  const[mealCat,setMealCat]=useState('breakfast');
-  const[showSaved,setShowSaved]=useState(false);
-  const[saveName,setSaveName]=useState('');
-  const[saveModal,setSaveModal]=useState(null);
-  const[logDate,setLogDate]=useState(Date.now());
-  const logDateStr=ds(logDate);
-  const logTs=()=>{const d=new Date(logDate);d.setHours(12,0,0,0);return d.getTime();};
-  const tf=foods.filter(f=>ds(f.ts)===logDateStr);
-  const tot=tf.reduce((a,f)=>({cal:a.cal+f.calories,pro:a.pro+f.protein}),{cal:0,pro:0});
-  const onAdd=item=>setFoods(f=>[...f,{...item,ts:logTs(),meal:mealCat}]);
-  const onEdit=updated=>setFoods(fs=>fs.map(f=>f.id===updated.id?updated:f));
-  const onDelete=id=>setFoods(fs=>fs.filter(f=>f.id!==id));
-  const MODES=[['product','ti-barcode','product',BLUE,ON_BLUE],['describe','ti-align-left','describe',PINK,ON_PINK],['photo','ti-camera','photo',CYAN,ON_CYAN]];
-  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-  const yFoods=foods.filter(f=>ds(f.ts)===yesterday.toDateString());
-  const canCopy=yFoods.length>0&&tf.length===0&&logDateStr===tod();
-  const copyYesterday=()=>setFoods(prev=>[...prev,...yFoods.map(f=>({...f,id:Date.now()+Math.random(),ts:logTs()}))]);
-  const todayNames=new Set(tf.map(f=>f.name));
-  const recent=[...foods].filter(f=>ds(f.ts)!==logDateStr).sort((a,b)=>b.ts-a.ts).filter((f,i,arr)=>arr.findIndex(x=>x.name===f.name)===i).filter(f=>!todayNames.has(f.name)).slice(0,6);
-  const quickAdd=f=>onAdd({...f,id:Date.now()+Math.random()});
-  const saveMeal=item=>{setSavedMeals(s=>[...s,{...item,id:Date.now(),savedAt:Date.now(),name:saveName||item.name}]);setSaveModal(null);setSaveName('');};
-  const catColors={breakfast:AMBER,lunch:CYAN,dinner:VIOLET,snacks:LIME};
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      {/* save meal modal */}
-      {saveModal&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(6,6,18,0.92)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
-          <div className="card" style={{width:'100%',maxWidth:380}}>
-            <p style={{fontSize:16,fontWeight:800,color:TX,marginBottom:14}}>save as meal</p>
-            <input value={saveName} onChange={e=>setSaveName(e.target.value)} placeholder={saveModal.name} style={{marginBottom:14}}/>
-            <div style={{display:'flex',gap:10}}>
-              <button className="btn sm" style={{flex:1,background:AMBER,color:ON_AMBER,border:'none',fontWeight:800,minHeight:48}} onClick={()=>saveMeal(saveModal)}>save</button>
-              <button className="btn sm ghost" style={{flex:1,minHeight:48}} onClick={()=>setSaveModal(null)}>cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* 1 - logging card: always first */}
-      <div className="card" style={{borderLeft:`4px solid ${PINK}`}}>
-        <DatePicker logDate={logDate} setLogDate={setLogDate}/>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-          <span style={{fontSize:12,color:MU,fontWeight:600}}>logging as</span>
-          {/* meal category with scroll fade */}
-          <div style={{position:'relative',overflow:'hidden'}}>
-            <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:2,WebkitOverflowScrolling:'touch',scrollbarWidth:'none',msOverflowStyle:'none'}}>
-              {MEAL_CATS.map(c=>(
-                <button key={c} onClick={()=>setMealCat(c)} style={{flexShrink:0,padding:'6px 12px',fontSize:12,border:`1px solid ${mealCat===c?catColors[c]:BDR}`,background:mealCat===c?h(catColors[c],0.15):'transparent',borderRadius:100,color:mealCat===c?catColors[c]:MU,fontWeight:mealCat===c?800:500,minHeight:36,transition:'all 0.15s'}}>
-                  {c}
-                </button>
-              ))}
-            </div>
-            <div style={{position:'absolute',right:0,top:0,bottom:0,width:24,background:'linear-gradient(to right,transparent,var(--sf))',pointerEvents:'none'}}/>
-          </div>
-        </div>
-        <div style={{display:'flex',gap:0,marginBottom:14,background:RZ,borderRadius:14,padding:4}}>
-          {MODES.map(([m,ic,lb,c,tc])=>(
-            <button key={m} onClick={()=>setMode(m)} style={{flex:1,padding:'10px 4px',fontSize:13,border:'none',background:mode===m?c:'transparent',borderRadius:11,color:mode===m?tc:MU,fontWeight:mode===m?800:500,transition:'all 0.15s',minHeight:48,letterSpacing:mode===m?'0.01em':'normal'}}>
-              <i className={`ti ${ic}`} style={{marginRight:4,fontSize:14,verticalAlign:-2}}/>{lb}
-            </button>
-          ))}
-        </div>
-        {mode==='product'&&<OFFSearch onAdd={onAdd}/>}
-        {mode==='describe'&&<AIEst onAdd={onAdd}/>}
-        {mode==='photo'&&<PhotoEst onAdd={onAdd}/>}
-      </div>
-      {/* 2 - today's log */}
-      {tf.length>0&&(
-        <div className="card">
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-            <span className="lbl" style={{marginBottom:0}}>today</span>
-            <div style={{display:'flex',gap:12}}>
-              <span style={{fontSize:14,fontWeight:800,color:PINK}}>{Math.round(tot.cal)}<span style={{color:MU,fontWeight:500,fontSize:12}}> kcal</span></span>
-              <span style={{fontSize:14,fontWeight:800,color:CYAN}}>{Math.round(tot.pro)}<span style={{color:MU,fontWeight:500,fontSize:12}}>g P</span></span>
-            </div>
-          </div>
-          {MEAL_CATS.map(cat=>{
-            const catFoods=tf.filter(f=>(f.meal||'breakfast')===cat);
-            if(!catFoods.length)return null;
-            const catCal=catFoods.reduce((s,f)=>s+f.calories,0);
-            const c=catColors[cat];
-            return(
-              <div key={cat} style={{marginBottom:14}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                  <span style={{fontSize:12,fontWeight:800,color:c,textTransform:'uppercase',letterSpacing:'0.08em'}}>{cat}</span>
-                  <span style={{fontSize:12,fontWeight:700,color:MU}}>{Math.round(catCal)} kcal</span>
-                </div>
-                {catFoods.map(f=>(
-                  <div key={f.id}>
-                    <FoodEntry f={f} onDelete={onDelete} onEdit={onEdit} onSave={()=>{setSaveModal(f);setSaveName(f.name);}}/>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {/* 3 - recently logged */}
-      {recent.length>0&&(
-        <div className="card">
-          <span className="lbl">recently logged</span>
-          <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {recent.map((f,i)=>(
-              <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${BDR}`,paddingBottom:8}}>
-                <div style={{flex:1,minWidth:0,marginRight:10}}>
-                  <p style={{fontSize:14,fontWeight:700,color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</p>
-                  <p style={{fontSize:11,color:MU,fontWeight:500}}>{f.serving} · {Math.round(f.calories)} kcal · {Math.round(f.protein)}g P</p>
-                </div>
-                <button className="btn sm" style={{background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:40,flexShrink:0}} onClick={()=>quickAdd(f)}>
-                  <i className="ti ti-plus" style={{fontSize:14}}/>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* 4 - saved meals */}
-      {savedMeals.length>0&&(
-        <div>
-          <button className="btn ghost sm" style={{color:AMBER,minHeight:44}} onClick={()=>setShowSaved(s=>!s)}>
-            <i className="ti ti-star" style={{fontSize:14,verticalAlign:-2}}/>{showSaved?'hide saved meals':'saved meals'}
-          </button>
-          {showSaved&&(
-            <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
-              {savedMeals.map(m=>(
-                <div key={m.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:SF,border:`1px solid ${BDR}`,borderRadius:14,padding:'10px 14px',borderLeft:`3px solid ${AMBER}`}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <p style={{fontSize:14,fontWeight:700,color:TX,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.name}</p>
-                    <p style={{fontSize:11,color:MU,fontWeight:500}}>{Math.round(m.calories)} kcal · {Math.round(m.protein)}g P</p>
-                  </div>
-                  <div style={{display:'flex',gap:6,marginLeft:10}}>
-                    <button className="btn sm" style={{background:AMBER,color:ON_AMBER,border:'none',fontWeight:800,minHeight:40}} onClick={()=>quickAdd(m)}><i className="ti ti-plus" style={{fontSize:14}}/></button>
-                    <button className="btn sm dng" style={{minHeight:40}} onClick={()=>setSavedMeals(s=>s.filter(x=>x.id!==m.id))}><i className="ti ti-x" style={{fontSize:13}}/></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {/* 5 - copy yesterday */}
-      {canCopy&&(
-        <button className="btn" style={{border:`1px solid ${h(CYAN,0.35)}`,color:CYAN,background:h(CYAN,0.08),borderRadius:16,padding:'14px 16px',textAlign:'left',fontWeight:700,minHeight:54}} onClick={copyYesterday}>
-          <i className="ti ti-copy" style={{marginRight:8,fontSize:16,verticalAlign:-2}}/>copy yesterday's log ({yFoods.length} item{yFoods.length!==1?'s':''})
-        </button>
-      )}
-    </div>
-  );
-}
-
-function ProgressTab({foods,workouts,weightLog,goals,ac}){
-  const[range,setRange]=useState(7);
-  const units=goals.units||'kg';
-  const ul=unitLabel(units);
-  const wk=workouts.filter(w=>(Date.now()-w.ts)/864e5<=range);
-  const dLog=new Set(foods.filter(f=>(Date.now()-f.ts)/864e5<=range).map(f=>ds(f.ts))).size;
-  const sw=[...weightLog].sort((a,b)=>b.ts-a.ts);
-  const lw=sw[0]?.weight,fw=[...weightLog].sort((a,b)=>a.ts-b.ts)[0]?.weight;
-  const lwD=lw?toDisplay(lw,units):null;
-  const deltaKg=lw&&fw?(lw-fw):null;
-  const deltaD=deltaKg!=null?(toDisplay(Math.abs(deltaKg),units)*(deltaKg<0?-1:1)).toFixed(1):null;
-  const trend=deltaD!=null?parseFloat(deltaD):null;
-  const avgCal=range>7?(()=>{
-    const days=[...new Set(foods.filter(f=>(Date.now()-f.ts)/864e5<=range).map(f=>ds(f.ts)))];
-    if(!days.length)return 0;
-    const total=foods.filter(f=>(Date.now()-f.ts)/864e5<=range).reduce((s,f)=>s+f.calories,0);
-    return Math.round(total/days.length);
-  })():null;
-  const rangeLabel={7:'last 7 days',30:'last 30 days',90:'last 90 days'}[range];
-
-  /* macro adherence - days hitting each goal */
-  const adherenceDays=[...new Set(foods.filter(f=>(Date.now()-f.ts)/864e5<=7).map(f=>ds(f.ts)))];
-  const adherence=['protein','carbs','fat','fibre'].map(k=>{
-    const goal=goals[k]||1;
-    const days=adherenceDays.filter(d=>{
-      const total=foods.filter(f=>ds(f.ts)===d).reduce((s,f)=>s+(f[k]||0),0);
-      return total>=goal*0.9;
-    });
-    return{k,days:days.length,total:adherenceDays.length};
-  });
-
-  /* volume by muscle group - last 7 days */
-  const muscleVol=(()=>{
-    const wk7=workouts.filter(w=>(Date.now()-w.ts)/864e5<=7);
-    const vol={};
-    wk7.forEach(w=>{vol[w.muscle]=(vol[w.muscle]||0)+w.sets.length;});
-    return Object.entries(vol).sort((a,b)=>b[1]-a[1]);
-  })();
-  const maxVol=Math.max(1,...muscleVol.map(([,v])=>v));
-
-  /* rolling 7-day average for weight */
-  const rollingAvg=(()=>{
-    const pts=[...weightLog].sort((a,b)=>a.ts-b.ts);
-    return pts.map((e,i)=>{
-      const window=pts.slice(Math.max(0,i-6),i+1);
-      return{ts:e.ts,weight:window.reduce((s,x)=>s+x.weight,0)/window.length};
-    });
-  })();
-
-  const adherenceColors={protein:CYAN,carbs:BLUE,fat:AMBER,fibre:LIME};
-
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:14,padding:4}}>
-        {[7,30,90].map(r=>(
-          <button key={r} onClick={()=>setRange(r)} style={{flex:1,padding:'10px 4px',fontSize:13,border:'none',background:range===r?CYAN:'transparent',borderRadius:11,color:range===r?ON_CYAN:MU,fontWeight:range===r?800:500,transition:'all 0.15s',minHeight:44}}>
-            {r}d
-          </button>
-        ))}
-      </div>
-      <div className="card">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-          <span className="lbl" style={{marginBottom:0}}>calories · {rangeLabel}</span>
-          <span style={{fontSize:11,color:MU,fontWeight:600}}>-- = goal</span>
-        </div>
-        <RangeBars foods={foods} goal={goals.calories} ac={ac} range={range}/>
-        {avgCal!==null&&(
-          <div style={{marginTop:12,display:'flex',justifyContent:'space-between',fontSize:13}}>
-            <span style={{color:MU,fontWeight:600}}>daily average</span>
-            <span style={{color:avgCal>goals.calories?PINK:LIME,fontWeight:800}}>{avgCal} kcal</span>
-          </div>
-        )}
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-        <ColorChip label="training sessions" value={wk.length} unit={rangeLabel} color={CYAN}/>
-        <ColorChip label="days logged" value={dLog} unit={rangeLabel} color={CYAN}/>
-      </div>
-      {/* macro adherence */}
-      {adherenceDays.length>0&&(
-        <div className="card">
-          <span className="lbl">macro adherence · last 7 days</span>
-          {adherence.map(({k,days,total})=>(
-            <div key={k} style={{marginBottom:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
-                <span style={{fontSize:13,color:MU,fontWeight:600,textTransform:'capitalize'}}>{k}</span>
-                <span style={{fontSize:13,fontWeight:800,color:days>=total*0.8?LIME:days>=total*0.5?AMBER:PINK}}>{days}/{total} days</span>
-              </div>
-              <div style={{height:6,borderRadius:3,background:DIM}}>
-                <div style={{height:'100%',borderRadius:3,background:adherenceColors[k],width:`${total?Math.round(days/total*100):0}%`,transition:'width 0.4s'}}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* volume by muscle group */}
-      {muscleVol.length>0&&(
-        <div className="card">
-          <span className="lbl">sets by muscle · last 7 days</span>
-          {muscleVol.map(([muscle,sets])=>(
-            <div key={muscle} style={{marginBottom:10}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
-                <span style={{fontSize:13,color:MU,fontWeight:600,textTransform:'capitalize'}}>{muscle}</span>
-                <span style={{fontSize:13,fontWeight:800,color:VIOLET}}>{sets} sets</span>
-              </div>
-              <div style={{height:8,borderRadius:4,background:DIM}}>
-                <div style={{height:'100%',borderRadius:4,background:VIOLET,width:`${Math.round(sets/maxVol*100)}%`,opacity:0.8}}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="card" style={{borderLeft:`4px solid ${BLUE}`}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-          <span className="lbl" style={{marginBottom:0}}>weight trend</span>
-          {lwD&&<span style={{fontSize:17,fontWeight:800,color:TX}}>{lwD}{ul}{trend!=null&&<span style={{fontSize:14,marginLeft:8,color:trend>0?PINK:LIME,fontWeight:800}}>{trend>0?'+':''}{deltaD}{ul}</span>}</span>}
-        </div>
-        <WtLine log={weightLog} rollingAvg={rollingAvg} units={units}/>
-        {weightLog.length>0&&(
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginTop:14}}>
-            {[['highest',toDisplay(Math.max(...weightLog.map(e=>e.weight)),units)+ul,PINK,ON_PINK],['lowest',toDisplay(Math.min(...weightLog.map(e=>e.weight)),units)+ul,LIME,ON_LIME],['entries',weightLog.length,RZ,TX]].map(([l,v,bg,tc])=>(
-              <div key={l} style={{textAlign:'center',background:bg,border:bg===RZ?`1px solid ${BDR}`:'none',borderRadius:14,padding:'12px 0'}}>
-                <div style={{fontSize:17,fontWeight:800,color:tc}}>{v}</div>
-                <div style={{fontSize:11,color:tc,fontWeight:700,opacity:bg===RZ?0.5:0.75,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function TDEECalc({loc,setLoc,units}){
-  const isLbs=units==='lbs';
-  const[sex,setSex]=useState('female');
-  const[age,setAge]=useState(30);
-  const[heightVal,setHeightVal]=useState(isLbs?65:165); // inches or cm
-  const[weightVal,setWeightVal]=useState(isLbs?143:65); // lbs or kg
-  const[activity,setActivity]=useState(1.375);
-  const[result,setResult]=useState(null);
-  const calc=()=>{
-    const kg=isLbs?weightVal/2.20462:weightVal;
-    const cm=isLbs?heightVal*2.54:heightVal;
-    const bmr=sex==='male'?(10*kg)+(6.25*cm)-(5*age)+5:(10*kg)+(6.25*cm)-(5*age)-161;
-    const tdee=Math.round(bmr*activity);
-    setResult({tdee,cut:tdee-400,bulk:tdee+300});
-  };
-  const acts=[['sedentary (desk job)',1.2],['light (1-3x/week)',1.375],['moderate (3-5x/week)',1.55],['active (6-7x/week)',1.725],['very active (2x/day)',1.9]];
-  const hu=isLbs?'in':'cm';const wu=isLbs?'lbs':'kg';
-  const hMn=isLbs?55:140;const hMx=isLbs?84:220;
-  const wMn=isLbs?88:40;const wMx=isLbs?440:200;
-  return(
-    <div>
-      <p style={{fontSize:13,color:MU,fontWeight:500,marginBottom:14,lineHeight:1.6}}>Don't know your calorie target? Calculate it from your stats.</p>
-      <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:12,padding:3,marginBottom:14}}>
-        {[['female','F'],['male','M']].map(([v,l])=>(
-          <button key={v} onClick={()=>setSex(v)} style={{flex:1,padding:'10px',fontSize:14,border:'none',background:sex===v?PINK:'transparent',borderRadius:10,color:sex===v?ON_PINK:MU,fontWeight:sex===v?800:500,minHeight:44}}>{l}</button>
-        ))}
-      </div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
-        {[['age','yrs',18,80,1,age,setAge,AMBER],[`height`,hu,hMn,hMx,1,heightVal,setHeightVal,CYAN],[`weight`,wu,wMn,wMx,1,weightVal,setWeightVal,LIME]].map(([lb,u,mn,mx,st,val,set,c])=>(
-          <div key={lb}>
-            <label style={{fontSize:11,color:c,fontWeight:700,display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.05em'}}>{lb} ({u})</label>
-            <input type="number" value={val} min={mn} max={mx} step={st} inputMode="numeric" onChange={e=>set(Math.max(mn,Math.min(mx,+e.target.value)))} style={{textAlign:'center',fontWeight:700}}/>
-          </div>
-        ))}
-      </div>
-      <div style={{marginBottom:14}}>
-        <label style={{fontSize:12,color:MU,fontWeight:600,display:'block',marginBottom:7}}>activity level</label>
-        <select value={activity} onChange={e=>setActivity(+e.target.value)}>{acts.map(([l,v])=><option key={v} value={v}>{l}</option>)}</select>
-      </div>
-      <button className="btn" style={{width:'100%',background:PINK,color:ON_PINK,border:'none',fontWeight:800,minHeight:50,marginBottom:result?14:0}} onClick={calc}>calculate</button>
-      {result&&(
-        <>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-            {[['cut',result.cut,CYAN],['maintain',result.tdee,LIME],['bulk',result.bulk,AMBER]].map(([l,v,c])=>(
-              <button key={l} onClick={()=>setLoc(lo=>({...lo,calories:v}))} style={{background:'#0D0D22',border:'1px solid rgba(255,255,255,0.07)',borderRadius:14,padding:'12px 6px',textAlign:'center',cursor:'pointer'}}>
-                <div style={{fontSize:17,fontWeight:800,color:c}}>{v}</div>
-                <div style={{fontSize:10,color:MU,fontWeight:700,marginTop:2,textTransform:'uppercase',letterSpacing:'0.05em'}}>{l}</div>
-              </button>
-            ))}
-          </div>
-          <p style={{fontSize:11,color:MU,textAlign:'center',marginTop:8,fontWeight:500}}>tap a goal to apply it</p>
-        </>
-      )}
-    </div>
-  );
-}
-
-function SettingsTab({goals,setGoals,ac}){
-  const[loc,setLoc]=useState({...goals});const[ok,setOk]=useState(false);
-  useEffect(()=>setLoc({...goals}),[goals]);
-  const save=()=>{setGoals({...loc});setOk(true);setTimeout(()=>setOk(false),2000);};
-  const flds=[['calories','daily calories','kcal',1000,4000,50,PINK],['protein','protein','g',40,350,5,CYAN],['carbs','carbs','g',50,550,5,BLUE],['fat','fat','g',20,180,5,AMBER],['fibre','fibre','g',10,80,1,LIME]];
-  return(
-    <div style={{display:'flex',flexDirection:'column',gap:14}}>
-      <div className="card">
-        <span className="lbl">profile</span>
-        <div style={{marginBottom:14}}>
-          <label style={{fontSize:14,color:MU,fontWeight:600,display:'block',marginBottom:8}}>your name</label>
-          <input value={loc.name||''} onChange={e=>setLoc(l=>({...l,name:e.target.value}))} autoComplete="given-name"/>
-        </div>
-        <div>
-          <label style={{fontSize:14,color:MU,fontWeight:600,display:'block',marginBottom:8}}>app name</label>
-          <input value={loc.appName||''} onChange={e=>setLoc(l=>({...l,appName:e.target.value}))}/>
-        </div>
-      </div>
-      <div className="card">
-        <span className="lbl">appearance</span>
-        <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:14,padding:4,marginBottom:12}}>
-          {[['dark','ti-moon','dark'],['light','ti-sun','light']].map(([val,ic,lbl])=>(
-            <button key={val} onClick={()=>setLoc(l=>({...l,theme:val}))} style={{
-              flex:1,padding:'12px 4px',fontSize:14,border:'none',
-              background:loc.theme===val?CYAN:'transparent',
-              borderRadius:11,color:loc.theme===val?ON_CYAN:MU,
-              fontWeight:loc.theme===val?800:500,transition:'all 0.18s',minHeight:50,
-              display:'flex',alignItems:'center',justifyContent:'center',gap:8
-            }}>
-              <i className={`ti ${ic}`} style={{fontSize:18}}/>{lbl} mode
-            </button>
-          ))}
-        </div>
-        <span className="lbl">units</span>
-        <div style={{display:'flex',gap:0,background:'var(--rz)',borderRadius:14,padding:4}}>
-          {[['kg','kg'],['lbs','lbs']].map(([val,lbl])=>(
-            <button key={val} onClick={()=>setLoc(l=>({...l,units:val}))} style={{
-              flex:1,padding:'12px 4px',fontSize:14,border:'none',
-              background:(loc.units||'kg')===val?VIOLET:'transparent',
-              borderRadius:11,color:(loc.units||'kg')===val?ON_VIOLET:MU,
-              fontWeight:(loc.units||'kg')===val?800:500,transition:'all 0.18s',minHeight:50
-            }}>{lbl}</button>
-          ))}
-        </div>
-      </div>
-      <div className="card">
-        <span className="lbl">TDEE calculator</span>
-        <p style={{fontSize:13,color:MU,fontWeight:500,marginBottom:14,lineHeight:1.6}}>Don't know your calorie target? Calculate it from your stats.</p>
-        <TDEECalc loc={loc} setLoc={setLoc} units={goals.units||'kg'}/>
-      </div>
-      <div className="card">
-        <span className="lbl">daily targets</span>
-        {flds.map(([k,lb,u,mn,mx,st,c])=><GoalField key={k} label={lb} k={k} u={u} mn={mn} mx={mx} st={st} c={c} loc={loc} setLoc={setLoc}/>)}
-        <button className="btn" style={{width:'100%',background:CYAN,color:ON_CYAN,border:'none',fontWeight:800,minHeight:54,fontSize:16}} onClick={save}>
-          {ok?<><i className="ti ti-check" style={{marginRight:6}}/>saved!</>:'save changes'}
-        </button>
-      </div>
-      <div className="card">
-        <span className="lbl">data</span>
-        <p style={{fontSize:13,color:MU,fontWeight:500,marginBottom:14,lineHeight:1.7}}>Export all your data as a JSON file. Keep it as a backup or import it elsewhere.</p>
-        <button className="btn" style={{width:'100%',minHeight:50,fontWeight:700,marginBottom:12}} onClick={()=>{
-          const data={foods:JSON.parse(localStorage.getItem('fit_foods')||'[]'),workouts:JSON.parse(localStorage.getItem('fit_workouts')||'[]'),weightLog:JSON.parse(localStorage.getItem('fit_wt')||'[]'),cardio:JSON.parse(localStorage.getItem('fit_cardio')||'[]'),goals:JSON.parse(localStorage.getItem('fit_goals')||'{}')};
-          const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download=`crunched-export-${new Date().toISOString().slice(0,10)}.json`;a.click();
-        }}>
-          <i className="ti ti-download" style={{marginRight:8,fontSize:16,verticalAlign:-2}}/>export data
-        </button>
-        <p style={{fontSize:13,color:MU,fontWeight:500,lineHeight:1.7}}>
-          <i className="ti ti-device-mobile" style={{marginRight:6,fontSize:14,verticalAlign:-2,color:CYAN}}/>
-          <span style={{color:CYAN,fontWeight:700}}>tip:</span> open Crunched in Safari and tap Share → Add to Home Screen for the full app experience.
-        </p>
-      </div>
-      <div className="card">
-        <span className="lbl">about</span>
-        <p style={{fontSize:14,color:MU,lineHeight:1.8,fontWeight:500}}>Food data: <span style={{color:CYAN,fontWeight:700}}>Open Food Facts</span> (open source, free). AI estimates and photo analysis: <span style={{color:VIOLET,fontWeight:700}}>Claude Sonnet</span>. Your data saves locally to your device.</p>
-      </div>
-    </div>
-  );
-}
-
-function App(){
-  const[tab,setTab]=useState('home');const[rdy,setRdy]=useState(false);
-  const[foods,setFoods]=useState([]);const[workouts,setWorkouts]=useState([]);
-  const[weightLog,setWeightLog]=useState([]);const[templates,setTemplates]=useState([]);
-  const[goals,setGoals]=useState(DG);const[cardio,setCardio]=useState([]);
-  const[savedMeals,setSavedMeals]=useState([]);
-  useEffect(()=>{
-    const f=stor.get('foods'),w=stor.get('workouts'),wl=stor.get('wt'),t=stor.get('tpls'),g=stor.get('goals'),c=stor.get('cardio'),sm=stor.get('savedMeals');
-    if(f)setFoods(f);if(w)setWorkouts(w);if(wl)setWeightLog(wl);if(t)setTemplates(t);if(g)setGoals(g);if(c)setCardio(c);if(sm)setSavedMeals(sm);
-    setRdy(true);
-  },[]);
-  useEffect(()=>{if(rdy)stor.set('foods',foods);},[foods,rdy]);
-  useEffect(()=>{if(rdy)stor.set('workouts',workouts);},[workouts,rdy]);
-  useEffect(()=>{if(rdy)stor.set('wt',weightLog);},[weightLog,rdy]);
-  useEffect(()=>{if(rdy)stor.set('tpls',templates);},[templates,rdy]);
-  useEffect(()=>{if(rdy)stor.set('goals',goals);},[goals,rdy]);
-  useEffect(()=>{if(rdy)stor.set('cardio',cardio);},[cardio,rdy]);
-  useEffect(()=>{if(rdy)stor.set('savedMeals',savedMeals);},[savedMeals,rdy]);
-
-  const ac=CYAN;
-  const streak=calcStreak(foods,workouts,cardio);
-  const[toast,setToast]=useState(null);
-  const prevStreak=React.useRef(streak);
-  useEffect(()=>{
-    if(!rdy)return;
-    const milestones=[3,7,14,30,60,90];
-    if(streak!==prevStreak.current&&milestones.includes(streak)){
-      setToast({emoji:'🔥',msg:`${streak} day streak!`,sub:'Keep it going'});
-      setTimeout(()=>setToast(null),3500);
-    }
-    prevStreak.current=streak;
-  },[streak,rdy]);
-  const appName=goals.appName||'Crunched';
-  const isDark=goals.theme!=='light';
-
-  useEffect(()=>{
-    document.body.classList.toggle('light',!isDark);
-    return()=>document.body.classList.remove('light');
-  },[isDark]);
-
-  /* nav: each tab has its own electric color */
-  const NAV=[
-    ['home','ti-layout-dashboard',ac],
-    ['train','ti-barbell',VIOLET],
-    ['cardio','ti-run',LIME],
-    ['food','ti-salad',PINK],
-    ['progress','ti-chart-line',BLUE],
-    ['settings','ti-settings',AMBER]
-  ];
-
-  if(!rdy)return<div style={{background:BG,minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}><p style={{color:MU,fontSize:15,fontWeight:600}}>loading...</p></div>;
-  if(!goals.name)return<Onboarding onComplete={(name,newGoals)=>setGoals(g=>({...g,...newGoals,name}))}/>;
-
-  /* weekly summary card data */
-  const weekFoods=foods.filter(f=>(Date.now()-f.ts)/864e5<=7);
-  const weekWorkouts=workouts.filter(w=>(Date.now()-w.ts)/864e5<=7);
-  const weekDaysLogged=new Set(weekFoods.map(f=>ds(f.ts))).size;
-  const weekAvgCal=weekDaysLogged?Math.round(weekFoods.reduce((s,f)=>s+f.calories,0)/weekDaysLogged):0;
-
-  return(
-    <div style={{background:BG,minHeight:'100vh'}}>
-      {/* achievement toast */}
-      {toast&&(
-        <div style={{position:'fixed',top:20,left:'50%',transform:'translateX(-50%)',zIndex:200,background:h(LIME,0.95),border:`1px solid ${LIME}`,borderRadius:16,padding:'12px 20px',textAlign:'center',boxShadow:`0 0 30px ${LIME}55`,minWidth:200,animation:'fadeIn 0.3s ease'}}>
-          <p style={{fontSize:22,marginBottom:2}}>{toast.emoji}</p>
-          <p style={{fontSize:15,fontWeight:800,color:'#060612'}}>{toast.msg}</p>
-          <p style={{fontSize:12,color:'#060612',opacity:0.7,fontWeight:600}}>{toast.sub}</p>
-        </div>
-      )}
-      <nav style={{position:'sticky',top:0,zIndex:10,background:'rgba(6,6,18,0.85)',backdropFilter:'blur(16px)',WebkitBackdropFilter:'blur(16px)',borderBottom:`1px solid rgba(255,255,255,0.08)`,padding:'6px 0 4px'}}>
-        <p style={{textAlign:'center',fontSize:11,fontWeight:800,color:MU,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:6}}>{appName}</p>
-        <div style={{display:'flex',justifyContent:'space-around',maxWidth:680,margin:'0 auto'}}>
-          {NAV.map(([id,ic,color])=>(
-            <button key={id} onClick={()=>setTab(id)} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:1,color:tab===id?color:MU,padding:'2px 8px',minWidth:58,minHeight:52}}>
-              <div style={{padding:'6px 14px',borderRadius:14,background:tab===id?color:'transparent',boxShadow:tab===id?`0 0 16px ${color}88`:'none',transition:'all 0.18s'}}>
-                <i className={`ti ${ic}`} style={{fontSize:21,display:'block',color:tab===id?'#060612':MU}}/>
-              </div>
-              <span style={{fontSize:10,fontWeight:tab===id?800:500,letterSpacing:'0.03em',color:tab===id?color:MU}}>{id}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
-      <div style={{maxWidth:680,margin:'0 auto',padding:'1rem 1rem 5rem'}}>
-        {tab==='home'&&(
-          <>
-            <Dashboard foods={foods} workouts={workouts} cardio={cardio} weightLog={weightLog} goals={goals} setWeightLog={setWeightLog} ac={ac} streak={streak}/>
-            {/* weekly summary card */}
-            {weekDaysLogged>0&&(
-              <div className="card" style={{marginTop:14,border:`1px solid ${h(CYAN,0.18)}`}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                  <span className="lbl" style={{marginBottom:0}}>this week</span>
-                  {streak>0&&<span style={{fontSize:12,color:LIME,fontWeight:800}}>🔥 {streak} day streak</span>}
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-                  {[['avg calories',weekAvgCal,'kcal/day',CYAN],['sessions',weekWorkouts.length,'workouts',CYAN],['days logged',weekDaysLogged,'/ 7',CYAN]].map(([l,v,u,c])=>(
-                    <div key={l} style={{textAlign:'center',background:'rgba(6,6,18,0.5)',borderRadius:14,padding:'12px 6px'}}>
-                      <div style={{fontSize:22,fontWeight:800,color:c}}>{v}</div>
-                      <div style={{fontSize:10,color:MU,fontWeight:600,marginTop:2}}>{l}</div>
-                      <div style={{fontSize:10,color:MU,fontWeight:500}}>{u}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-        {tab==='train'&&<TrainTab workouts={workouts} setWorkouts={setWorkouts} templates={templates} setTemplates={setTemplates}/>}
-        {tab==='cardio'&&<CardioLog cardio={cardio} setCardio={setCardio} weightLog={weightLog}/>}
-        {tab==='food'&&<FoodTab foods={foods} setFoods={setFoods} savedMeals={savedMeals} setSavedMeals={setSavedMeals}/>}
-        {tab==='progress'&&<ProgressTab foods={foods} workouts={workouts} weightLog={weightLog} goals={goals} ac={ac}/>}
-        {tab==='settings'&&<SettingsTab goals={goals} setGoals={setGoals} ac={ac}/>}
-      </div>
-    </div>
-  );
-}
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-</script>
 <script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  });
+// ── EXERCISE DATA ──────────────────────────────────────────────────────────────
+const exercises = {
+  back: [
+    { id:'lat_pulldown', name:'Lat Pulldown', target:'4 sets x 8-12 reps', sets:4, apiName:'cable pulldown', cardClass:'back-card',
+      cues:['Grip slightly wider than shoulder-width. Lean back 10-15 degrees, chest up.','Pull bar to upper chest. Lead with elbows — drive them down toward your back pockets.','Squeeze shoulder blades down and together at the bottom. Hold briefly.','Control the return all the way to a full stretch before the next rep.'],
+      muscles:{primary:['Lats'],secondary:['Rhomboids','Rear delts','Biceps']} },
+    { id:'seated_row', name:'Seated Cable Row', target:'3 sets x 10-12 reps', sets:3, apiName:'cable seated row', cardClass:'back-card',
+      cues:['Sit tall, slight knee bend. Arms fully extended, back neutral before each rep.','Pull handle to lower chest. Elbows stay tight to your body.','Retract shoulder blades fully. Hold 1 second at peak.','Extend arms fully each rep — full range of motion every time.'],
+      muscles:{primary:['Mid back','Rhomboids'],secondary:['Lats','Rear delts','Biceps']} },
+    { id:'db_row', name:'Single Arm DB Row', target:'3 sets x 10-12 reps each', sets:3, apiName:'dumbbell single arm row', cardClass:'back-card',
+      cues:['Brace with opposite hand and knee on bench. Back flat, parallel to floor.','Pull the dumbbell to hip — not armpit. Elbow drives back and up.','Slight torso rotation is fine to get full range. No back rounding.','Lower slowly with control. Don\'t drop the weight.'],
+      muscles:{primary:['Lats','Mid back'],secondary:['Rear delts','Biceps','Core']} },
+    { id:'face_pull', name:'Face Pull', target:'3 sets x 15 reps', sets:3, apiName:'cable face pull', cardClass:'back-card',
+      cues:['Rope at upper chest/eye height. Grip with thumbs toward you.','Pull to face level, separating the rope ends. Elbows flare out wide.','Externally rotate at peak — hands finish behind the rope.','Light weight. This is shoulder health work, not a strength exercise.'],
+      muscles:{primary:['Rear delts','External rotators'],secondary:['Traps','Rhomboids']} },
+  ],
+  biceps: [
+    { id:'bicep_curl', name:'Bicep Curl', target:'3 sets x 10-12 reps', sets:3, apiName:'barbell curl', cardClass:'arms-card',
+      cues:['Stand tall, core braced. Elbows pinned to sides — they stay there the whole set.','Curl to shoulder height. No swinging, no momentum.','Supinate wrists at the top for full bicep contraction.','Lower in 2-3 seconds. The eccentric is where growth happens.'],
+      muscles:{primary:['Biceps'],secondary:['Forearms','Front delts']} },
+    { id:'hammer_curl', name:'Hammer Curl', target:'3 sets x 10-12 reps', sets:3, apiName:'dumbbell hammer curl', cardClass:'arms-card',
+      cues:['Neutral grip throughout — thumbs up, no rotation.','Curl straight up, elbows fixed to your sides.','Targets brachialis and brachioradialis — builds arm thickness, not just peak.','Alternate arms or do both simultaneously.'],
+      muscles:{primary:['Brachialis','Brachioradialis'],secondary:['Biceps','Forearms']} },
+  ],
+  triceps: [
+    { id:'tricep_pushdown', name:'Tricep Pushdown', target:'3 sets x 12 reps', sets:3, apiName:'cable pushdown', cardClass:'arms-card',
+      cues:['High cable, rope or bar. Elbows pinned at your sides — they do not move.','Push down until arms fully extend. Squeeze triceps hard at the bottom.','With rope: flare the ends apart at the bottom for extra contraction.','Slow return. Don\'t let the cable pull you back.'],
+      muscles:{primary:['Triceps (all heads)'],secondary:['Forearms']} },
+    { id:'overhead_ext', name:'Overhead Tricep Extension', target:'3 sets x 10-12 reps', sets:3, apiName:'dumbbell triceps extension', cardClass:'arms-card',
+      cues:['Seated or standing. One or two dumbbells overhead, upper arms framing your ears.','Lower behind your head by bending at the elbow only. Upper arms stay completely still.','Lower to full stretch, then extend back to lockout.','Hits the long head specifically — essential for complete tricep development.'],
+      muscles:{primary:['Triceps (long head)'],secondary:['Triceps (lateral/medial)']} },
+  ],
+  glutes: [
+    { id:'hip_thrust', name:'Hip Thrusts', target:'4 sets x 8-12 reps', sets:4, apiName:'barbell hip thrust', cardClass:'legs-card',
+      cues:['Shoulder blades on bench edge, feet flat and hip-width. Bar padded across hips.','Drive through heels and squeeze glutes hard at the top. Hips fully extended, not hyperextended.','Lower controlled. Neutral spine — don\'t let lower back arch or ribs flare.','1-second pause at the top for maximum glute activation.'],
+      muscles:{primary:['Glutes','Hamstrings'],secondary:['Core','Hip flexors']} },
+    { id:'rdl', name:'Romanian Deadlift', target:'3 sets x 8-10 reps', sets:3, apiName:'romanian deadlift', cardClass:'legs-card',
+      cues:['Start standing, soft knee bend. Push hips back — not down.','Bar stays close to your legs. Lower until hamstrings are fully stretched.','Drive hips forward to stand. Squeeze glutes at the top.','Back flat and core braced throughout. No rounding.'],
+      muscles:{primary:['Hamstrings','Glutes'],secondary:['Erectors','Core']} },
+    { id:'sumo_squat', name:'Sumo Squat', target:'3 sets x 10-12 reps', sets:3, apiName:'sumo squat', cardClass:'legs-card',
+      cues:['Wide stance, toes turned out 45 degrees. Barbell or single dumbbell held centrally.','Sit straight down. Knees track over toes — don\'t let them cave.','Drive through your whole foot to stand. Squeeze glutes at the top.','Depth at or below parallel for full glute engagement.'],
+      muscles:{primary:['Glutes','Inner thighs'],secondary:['Quads','Hamstrings']} },
+    { id:'cable_kickback', name:'Cable Kickback', target:'3 sets x 12-15 reps each', sets:3, apiName:'cable hip abduction', cardClass:'legs-card',
+      cues:['Ankle attachment on low cable. Slight forward lean, core tight.','Kick straight back and up in a controlled arc. Don\'t swing.','Squeeze the glute hard at full extension. Hold 1 second.','Return slowly — the eccentric matters as much as the push.'],
+      muscles:{primary:['Glutes (max)'],secondary:['Hamstrings','Core']} },
+  ],
+  core: [
+    { id:'dead_bug', name:'Dead Bug', target:'3 sets x 10 reps each side', sets:3, apiName:'dead bug', cardClass:'core-card',
+      cues:['Lie on back. Arms up, knees at 90 degrees, lower back flat to floor.','Lower opposite arm and leg simultaneously. Back must stay flat.','Exhale as you lower. Floor contact is your feedback.','Return, repeat other side. Slow and deliberate.'],
+      muscles:{primary:['Deep core','Transverse abdominis'],secondary:['Hip flexors','Obliques']} },
+    { id:'plank', name:'Plank Hold', target:'3 sets x 45-60 sec', sets:3, apiName:'plank', cardClass:'core-card',
+      cues:['Forearms on floor. Body in a straight line from head to heels.','Don\'t let hips sag or pike. Squeeze glutes and brace abs simultaneously.','Tuck pelvis slightly — neutralises lower back arch.','Push the floor away with forearms. Make yourself longer.'],
+      muscles:{primary:['Transverse abs','Core stabilisers'],secondary:['Glutes','Shoulders']} },
+    { id:'cable_crunch', name:'Cable Crunch', target:'3 sets x 12-15 reps', sets:3, apiName:'cable crunch', cardClass:'core-card',
+      cues:['Kneel facing cable. Rope at forehead. Hips stay fixed throughout.','Crunch down by rounding your spine — elbows toward knees.','Squeeze abs hard at the bottom. Feel abs, not hip flexors.','Controlled return. Don\'t let the cable pull you back passively.'],
+      muscles:{primary:['Rectus abdominis'],secondary:['Obliques']} },
+    { id:'pallof_press', name:'Pallof Press', target:'3 sets x 10 reps each side', sets:3, apiName:'pallof press', cardClass:'core-card',
+      cues:['Stand side-on to cable at chest height. Hold at chest, feet shoulder-width.','Press straight out in front. Core braces to resist rotation.','Hold 2 seconds extended. Return. Don\'t let cable pull you sideways.','Anti-rotation training. Transfers to every compound lift.'],
+      muscles:{primary:['Obliques','Transverse abs'],secondary:['Glutes','Shoulders']} },
+  ]
+};
+
+const allBuiltIn = [...exercises.back,...exercises.biceps,...exercises.triceps,...exercises.glutes,...exercises.core];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let RAPID_API_KEY = localStorage.getItem('liftlog_api_key') || '';
+let currentDay = 'arms';
+let addingToDay = 'arms';
+
+function getCustom() {
+  try { return JSON.parse(localStorage.getItem('liftlog_custom') || '{"arms":[],"legs":[]}'); }
+  catch { return {arms:[],legs:[]}; }
 }
+function saveCustom(c) { localStorage.setItem('liftlog_custom', JSON.stringify(c)); }
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('liftlog_history') || '[]'); }
+  catch { return []; }
+}
+function saveHistory(h) { localStorage.setItem('liftlog_history', JSON.stringify(h)); }
+
+function getLastSession(id) {
+  const history = getHistory();
+  for (let i = history.length - 1; i >= 0; i--) {
+    const ex = history[i].exercises?.find(e => e.id === id);
+    if (ex && ex.sets.some(s => s.weight || s.reps)) return ex;
+  }
+  return null;
+}
+
+function formatLast(ex) {
+  if (!ex) return null;
+  const filled = ex.sets.filter(s => s.weight || s.reps);
+  if (!filled.length) return null;
+  return filled.map((s,i) => `Set ${i+1}: <span>${s.weight||'?'}kg</span> x <span>${s.reps||'?'}</span>`).join(' &nbsp;|&nbsp; ');
+}
+
+// ── API KEY ────────────────────────────────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { showToast('Paste a key first'); return; }
+  RAPID_API_KEY = key;
+  localStorage.setItem('liftlog_api_key', key);
+  document.getElementById('apiBanner').style.display = 'none';
+  showToast('Key saved');
+}
+
+function initApiBanner() {
+  document.getElementById('apiBanner').style.display = RAPID_API_KEY ? 'none' : 'block';
+}
+
+// ── REST TIMER ─────────────────────────────────────────────────────────────────
+let restDuration = 90, restRemaining = 0, restRunning = false, restInterval = null;
+
+function adjustRest(delta) {
+  restDuration = Math.max(30, Math.min(300, restDuration + delta));
+  document.getElementById('restDuration').textContent = restDuration + 's';
+  if (!restRunning) restRemaining = restDuration;
+}
+
+function toggleRest() {
+  if (restRunning) {
+    clearInterval(restInterval); restRunning = false;
+    updateRestUI(false); return;
+  }
+  restRemaining = restDuration; restRunning = true;
+  updateRestUI(true);
+  restInterval = setInterval(() => {
+    restRemaining--;
+    updateRestUI(true);
+    if (restRemaining <= 0) { clearInterval(restInterval); restRunning = false; restDone(); }
+  }, 1000);
+}
+
+function updateRestUI(active) {
+  const btn = document.getElementById('restBtn');
+  const display = document.getElementById('restDisplay');
+  const adjust = document.getElementById('restAdjust');
+  if (active) {
+    const m = Math.floor(restRemaining/60), s = restRemaining%60;
+    display.textContent = m > 0 ? `${m}:${String(s).padStart(2,'0')}` : `${restRemaining}s`;
+    display.classList.add('visible'); display.classList.remove('done');
+    adjust.classList.add('visible');
+    btn.textContent = 'Stop'; btn.classList.add('active');
+  } else {
+    display.classList.remove('visible'); adjust.classList.remove('visible');
+    btn.textContent = 'Rest Timer'; btn.classList.remove('active');
+  }
+}
+
+function restDone() {
+  const display = document.getElementById('restDisplay');
+  display.textContent = 'Go!';
+  display.classList.add('visible','done');
+  document.getElementById('restBtn').textContent = 'Rest Timer';
+  document.getElementById('restBtn').classList.remove('active');
+  document.getElementById('restAdjust').classList.remove('visible');
+  if (navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+  playBeep();
+  setTimeout(() => display.classList.remove('visible','done'), 3000);
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.3,0.6].forEach(t => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.25, ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.25);
+      osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+0.25);
+    });
+  } catch(e) {}
+}
+
+// ── OVERLOAD INDICATOR ─────────────────────────────────────────────────────────
+function updateOverloadIcon(exerciseId, setIndex, weight) {
+  const icon = document.getElementById(`${exerciseId}_ol_${setIndex}`);
+  if (!icon) return;
+  const last = getLastSession(exerciseId);
+  if (!last || !last.sets[setIndex]) { icon.classList.remove('visible'); return; }
+  const lastW = parseFloat(last.sets[setIndex].weight);
+  const currW = parseFloat(weight);
+  if (isNaN(lastW) || isNaN(currW) || currW === 0) { icon.classList.remove('visible'); return; }
+  const result = currW > lastW ? 'up' : currW < lastW ? 'down' : 'same';
+  icon.className = `overload-icon visible ${result}`;
+  icon.textContent = result === 'up' ? '↑' : result === 'down' ? '↓' : '=';
+}
+
+// ── BUILD CARD ─────────────────────────────────────────────────────────────────
+function buildCard(ex, isCustom = false) {
+  const last = getLastSession(ex.id);
+  const lastHTML = formatLast(last);
+  const cardClass = isCustom ? 'custom-card' : ex.cardClass;
+
+  let rows = '';
+  for (let i = 0; i < ex.sets; i++) {
+    rows += `<tr>
+      <td class="set-num-cell">${i+1}</td>
+      <td><input class="set-input" type="number" inputmode="decimal" placeholder="0" step="0.5" min="0"
+        id="${ex.id}_set${i}_weight" oninput="updateOverloadIcon('${ex.id}',${i},this.value)"></td>
+      <td><input class="set-input" type="number" inputmode="numeric" placeholder="0" step="1" min="0"
+        id="${ex.id}_set${i}_reps"></td>
+      <td class="overload-cell"><span class="overload-icon" id="${ex.id}_ol_${i}"></span></td>
+    </tr>`;
+  }
+
+  const actionBtn = isCustom
+    ? `<button class="remove-btn" onclick="removeCustom('${ex.id}','${ex.day}')">Remove</button>`
+    : `<button class="how-to-btn" onclick="openModal('${ex.id}')">How to</button>`;
+
+  return `
+    <div class="exercise-card ${cardClass}" id="card_${ex.id}">
+      <div class="card-top">
+        <div class="exercise-name">${ex.name}</div>
+        <div class="card-actions">${actionBtn}</div>
+      </div>
+      <div class="exercise-target">${ex.target || `${ex.sets} sets`}</div>
+      <div class="last-session">
+        <div class="last-session-label">Last session</div>
+        <div class="last-session-data">${lastHTML ? lastHTML : '<span class="no-data">No data yet</span>'}</div>
+      </div>
+      <table class="sets-table">
+        <thead><tr><th>#</th><th>kg</th><th>reps</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <textarea class="exercise-notes" id="${ex.id}_notes" placeholder="Notes..." rows="1"></textarea>
+    </div>`;
+}
+
+// ── BUILD VIEWS ────────────────────────────────────────────────────────────────
+function buildArms() {
+  document.getElementById('back-grid').innerHTML    = exercises.back.map(e => buildCard(e)).join('');
+  document.getElementById('biceps-grid').innerHTML  = exercises.biceps.map(e => buildCard(e)).join('');
+  document.getElementById('triceps-grid').innerHTML = exercises.triceps.map(e => buildCard(e)).join('');
+  buildCustomGrid('arms');
+}
+
+function buildLegs() {
+  document.getElementById('glutes-grid').innerHTML = exercises.glutes.map(e => buildCard(e)).join('');
+  document.getElementById('core-grid').innerHTML   = exercises.core.map(e => buildCard(e)).join('');
+  buildCustomGrid('legs');
+}
+
+function buildCustomGrid(day) {
+  const custom = getCustom();
+  const grid = document.getElementById(`${day}-custom-grid`);
+  const exs = custom[day] || [];
+  grid.style.display = exs.length ? 'grid' : 'none';
+  grid.innerHTML = exs.map(e => buildCard(e, true)).join('');
+}
+
+// ── CUSTOM EXERCISES ───────────────────────────────────────────────────────────
+function openAddModal(day) {
+  addingToDay = day;
+  document.getElementById('addModalSub').textContent = day === 'arms' ? 'Arms Day' : 'Legs + Core Day';
+  document.getElementById('addName').value = '';
+  document.getElementById('addSets').value = '3';
+  document.getElementById('addTarget').value = '';
+  document.getElementById('addModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('addName').focus(), 300);
+}
+
+function closeAddModal() { document.getElementById('addModalOverlay').classList.remove('open'); }
+function closeAddModalOnOverlay(e) { if (e.target === document.getElementById('addModalOverlay')) closeAddModal(); }
+
+function confirmAddExercise() {
+  const name = document.getElementById('addName').value.trim();
+  if (!name) { showToast('Add a name first'); return; }
+  const sets = parseInt(document.getElementById('addSets').value) || 3;
+  const target = document.getElementById('addTarget').value.trim() || `${sets} sets`;
+  const custom = getCustom();
+  custom[addingToDay].push({ id:'custom_'+Date.now(), name, sets, target, day: addingToDay });
+  saveCustom(custom);
+  closeAddModal();
+  if (addingToDay === 'arms') buildArms(); else buildLegs();
+  showToast('Exercise added');
+}
+
+function removeCustom(id, day) {
+  if (!confirm('Remove this exercise?')) return;
+  const custom = getCustom();
+  custom[day] = custom[day].filter(e => e.id !== id);
+  saveCustom(custom);
+  if (day === 'arms') buildArms(); else buildLegs();
+}
+
+// ── LOG SESSION ────────────────────────────────────────────────────────────────
+function getActiveDayExercises() {
+  const custom = getCustom();
+  if (currentDay === 'arms') return [...exercises.back,...exercises.biceps,...exercises.triceps,...(custom.arms||[])];
+  return [...exercises.glutes,...exercises.core,...(custom.legs||[])];
+}
+
+function logSession() {
+  const exs = getActiveDayExercises();
+  const data = exs.map(ex => ({
+    id: ex.id, name: ex.name,
+    sets: Array.from({length:ex.sets},(_,i) => ({
+      weight: document.getElementById(`${ex.id}_set${i}_weight`)?.value || '',
+      reps:   document.getElementById(`${ex.id}_set${i}_reps`)?.value   || ''
+    })),
+    notes: document.getElementById(`${ex.id}_notes`)?.value || ''
+  }));
+  if (!data.some(ex => ex.sets.some(s => s.weight || s.reps))) { showToast('Add some weights first!'); return; }
+  const history = getHistory();
+  history.push({ date: new Date().toISOString(), day: currentDay, exercises: data });
+  saveHistory(history);
+  showToast('Session logged!');
+  setTimeout(() => { if (currentDay === 'arms') buildArms(); else buildLegs(); }, 700);
+}
+
+// ── HISTORY ────────────────────────────────────────────────────────────────────
+function buildHistory() {
+  const history = getHistory();
+  const container = document.getElementById('history-list');
+  if (!history.length) { container.innerHTML = '<div class="history-empty">No sessions logged yet.</div>'; return; }
+  const dayLabels = { arms:'Arms', legs:'Legs + Core' };
+  container.innerHTML = [...history].reverse().map(session => {
+    const date = new Date(session.date);
+    const dateStr = date.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const timeStr = date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const exCount = session.exercises.filter(e => e.sets.some(s => s.weight||s.reps)).length;
+    const dayLabel = dayLabels[session.day]||'';
+    const exercisesHTML = session.exercises
+      .filter(e => e.sets.some(s => s.weight||s.reps))
+      .map(ex => {
+        const filled = ex.sets.filter(s => s.weight||s.reps);
+        const rows = filled.map((s,i) => {
+          const vol = s.weight && s.reps ? Math.round(parseFloat(s.weight) * parseFloat(s.reps)) + ' vol' : '';
+          return `<tr>
+            <td class="set-n">S${i+1}</td>
+            <td>${s.weight||'?'}kg</td>
+            <td>${s.reps||'?'} reps</td>
+            <td class="set-vol">${vol}</td>
+          </tr>`;
+        }).join('');
+        return `<div class="history-exercise">
+          <div class="history-exercise-name">${ex.name}</div>
+          <table class="history-set-table">
+            <thead><tr><th></th><th>Weight</th><th>Reps</th><th style="text-align:right">Volume</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          ${ex.notes?`<div class="history-note">${ex.notes}</div>`:''}
+        </div>`;
+      }).join('');
+    const dayColor = session.day === 'arms' ? '#e85d75' : '#f5a623';
+    return `<div class="history-session">
+      <div class="history-session-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div>
+          <div class="history-session-date">${dateStr}</div>
+          <div class="history-session-day" style="color:${dayColor}">${dayLabel}</div>
+        </div>
+        <div class="history-session-meta">
+          <div class="history-session-count">${exCount} exercises</div>
+          <div>${timeStr}</div>
+        </div>
+      </div>
+      <div class="history-session-body">
+        ${exercisesHTML}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all history? This cannot be undone.')) return;
+  localStorage.removeItem('liftlog_history');
+  buildHistory(); buildArms(); buildLegs();
+  showToast('History cleared');
+}
+
+// ── HOW-TO MODAL ───────────────────────────────────────────────────────────────
+const groupColors = {'back-card':'#5db8f5','arms-card':'#e85d75','legs-card':'#f5a623','core-card':'#a78bfa'};
+const groupNames  = {'back-card':'Back','arms-card':'Arms','legs-card':'Glutes / Hamstrings','core-card':'Core'};
+
+const isLocalFile = () => window.location.protocol === 'file:';
+
+async function openModal(exerciseId) {
+  const ex = allBuiltIn.find(e => e.id === exerciseId);
+  if (!ex) return;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalTitle').textContent = ex.name;
+  const sub = document.getElementById('modalSub');
+  sub.textContent = groupNames[ex.cardClass]||'';
+  sub.style.color = groupColors[ex.cardClass]||'#666';
+
+  document.getElementById('modalCues').innerHTML = ex.cues.map((c,i) =>
+    `<li><span class="cue-num">0${i+1}</span><span>${c}</span></li>`
+  ).join('');
+
+  document.getElementById('modalMuscles').innerHTML =
+    ex.muscles.primary.map(m=>`<span class="muscle-tag primary">${m}</span>`).join('') +
+    ex.muscles.secondary.map(m=>`<span class="muscle-tag">${m}</span>`).join('');
+
+  const gif = document.getElementById('gifContainer');
+
+  if (isLocalFile()) {
+    gif.innerHTML = `<div class="gif-status">GIFs load on the live site.<br>Opening locally — deploy to Netlify first.<br><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name+' exercise form')}" target="_blank">Watch on YouTube instead</a></div>`;
+    return;
+  }
+
+  if (!RAPID_API_KEY) {
+    gif.innerHTML = `<div class="gif-status">Add your free API key to see GIFs.<br><a href="https://rapidapi.com/justin-WFnsXH_t6/api/exercisedb" target="_blank">Get key at RapidAPI</a></div>`;
+    return;
+  }
+
+  gif.innerHTML = '<div class="gif-status">Loading...</div>';
+
+  try {
+    const res = await fetch(
+      `https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(ex.apiName)}?limit=1&offset=0&sortOrder=ascending&sortMethod=bodyPart`,
+      { headers: { 'x-rapidapi-key': RAPID_API_KEY, 'x-rapidapi-host': 'exercisedb.p.rapidapi.com', 'Content-Type': 'application/json' } }
+    );
+    const data = await res.json();
+    const results = Array.isArray(data) ? data : (data.exercises||data.results||[]);
+    if (results.length && results[0].gifUrl) {
+      const img = new Image();
+      img.src = results[0].gifUrl; img.alt = ex.name;
+      img.onload = () => { gif.innerHTML = ''; gif.appendChild(img); };
+      img.onerror = () => { gif.innerHTML = gifFallback(ex); };
+    } else {
+      gif.innerHTML = gifFallback(ex);
+    }
+  } catch(e) {
+    gif.innerHTML = gifFallback(ex);
+  }
+}
+
+function gifFallback(ex) {
+  const q = encodeURIComponent(ex.name+' exercise form how to');
+  return `<div class="gif-status">Couldn't load GIF.<br><a href="https://www.youtube.com/results?search_query=${q}" target="_blank">Watch on YouTube</a></div>`;
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOnOverlay(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeAddModal(); } });
+
+// ── TABS ───────────────────────────────────────────────────────────────────────
+function switchTab(day, event) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(`${day}-view`).classList.add('active');
+  currentDay = day;
+  document.getElementById('logBtnWrap').style.display = day === 'hist' ? 'none' : 'flex';
+  if (day === 'hist') buildHistory();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────────
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+initApiBanner();
+buildArms();
+buildLegs();
 </script>
 </body>
 </html>
